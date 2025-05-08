@@ -11,6 +11,13 @@ class DatabaseSeeder extends Seeder
         $this->call([
             LevelSeeder::class,
             UserSeeder::class,
+            KriteriaSeeder::class,
+            DetailKriteriaSeeder::class,
+            AdminKriteriaSeeder::class,
+            KategoriKriteriaSeeder::class,
+            DataPendukungSeeder::class,
+            KomentarSeeder::class,
+            ValidasiSeeder::class,
         ]);
     }
 }
