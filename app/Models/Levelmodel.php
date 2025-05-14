@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class LevelModel extends Model
 {
     protected $table = 'm_level';
-    protected $primaryKey = 'level_id';
-    protected $fillable = ['level_kode', 'level_nama']; //Foreign key
+    protected $primaryKey = 'id_level';
+    public $timestamps = false;
 
-    public function users(): HasMany
+    public function users()
     {
-        return $this->hasMany(UserModel::class, 'level_id', 'level_id');
+        return $this->hasMany(User::class, 'id_level');
     }
 }
