@@ -9,62 +9,34 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 use Illuminate\Foundation\Auth\User as Authenticatable; // implementasi class Authenticatable
 
-class UserModel extends Authenticatable implements JWTSubject
+class UserModel extends Model
 {
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
-
-    public function getJWTCustomClaims()
-    {
-        return [];
-    }
-    use HasFactory;
-
     protected $table = 'm_user';
-    protected $primaryKey = 'user_id';
-    protected $fillable = ['username', 'password', 'nama', 'level_id', 'created_at', 'updated_at', 'foto_profil', 'image'];
+    protected $primaryKey = 'id_user';
+    public $timestamps = false;
 
-    protected $hidden = ['password']; // jangan di tampilkan saat select
-
-    protected $casts = ['password' => 'hashed']; // casting password agar otomatis di hash
-
-    /**
-     * Relasi ke tabel level
-     */
-    public function level(): BelongsTo
+    public function level()
     {
-        return $this->belongsTo(LevelModel::class, 'level_id', 'level_id');
+        return $this->belongsTo(LevelModel::class, 'id_level');
     }
 
-    /**
-     * Mendapatkan nama role
-     */
-    public function getRoleName(): string
+    public function kriteria()
     {
-        return $this->level->level_nama;
+        return $this->hasOne(KriteriaModel::class, 'id_user');
     }
 
-    /**
-     * Cek apakah user memiliki role tertentu
-     */
-    public function hasRole($role) : bool
+    public function validasi()
     {
-        return $this->level->level_kode == $role;
+        return $this->hasMany(ValidasiModel::class, 'id_user');
     }
 
-    /**
-      * Mendapatkan kode role
-      */
-      public function getRole()
-      {
-          return $this->level->level_kode;
-      }
-      protected function image(): Attribute 
-     { 
-         return Attribute::make( 
-             get: fn ($image) => url('/storage/posts/' . $image),
-         );
-     } 
+    public function komentar()
+    {
+        return $this->hasMany(KomentarModel::class, 'id_user');
+    }
+
+    public function finalDocument()
+    {
+        return $this->hasOne(FinalDocumentModel::class, 'id_user');
+    }
 }
