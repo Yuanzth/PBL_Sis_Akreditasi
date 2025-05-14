@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Masuk Sistem</title>
 
     <!-- Google Font: Poppins -->
@@ -24,7 +25,7 @@
     <!-- Custom CSS for Background and Form -->
     <style>
         .login-page {
-            background: url('loginn/Login.png') no-repeat center center fixed;
+            background: url('{{ asset('loginn/Login.png') }}') no-repeat center center fixed;
             background-size: cover;
             position: relative;
             min-height: 100vh;
@@ -32,7 +33,6 @@
             align-items: center;
             justify-content: center;
             transition: background 0.5s ease;
-            /* Smooth transition for background changes */
         }
 
         body {
@@ -43,7 +43,6 @@
             position: relative;
             z-index: 2;
             background: rgba(224, 242, 241, 0.9);
-            /* Light cyan background */
             border-radius: 15px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             padding: 20px;
@@ -100,7 +99,6 @@
             max-width: 100px;
         }
 
-        /* Style for background selector */
         .bg-selector {
             margin-bottom: 20px;
             padding: 5px;
@@ -113,46 +111,41 @@
 
 <body class="hold-transition login-page">
     <div class="login-box">
-        
-            <div class="card-header text-center">
-                <a></a>
-            </div>
-            <div class="card-body">
-                <img src="{{ asset('loginn/logo_jti.png') }}" alt="JTI Logo" class="login-logo">
-                <h2 class="login-box-msg"><b>Masuk Sistem</b></h2>
-                <p class="login-box-msg">Masukkan username dan password yang terdaftar di sistem</p>
+        <div class="card-body">
+            <img src="{{ asset('loginn/logo_jti.png') }}" alt="JTI Logo" class="login-logo">
+            <h2 class="login-box-msg"><b>Masuk Sistem</b></h2>
+            <p class="login-box-msg">Masukkan username dan password yang terdaftar di sistem</p>
 
-                <form action="{{ url('login') }}" method="POST" id="form-login">
-                    @csrf
+            <form action="{{ url('login') }}" method="POST" id="form-login">
+                @csrf
 
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <div class="input-group">
-                            <input type="text" id="username" name="username" class="form-control">
-                            <div class="input-group-append"></div>
-                        </div>
-                        <small id="error-username" class="error-text text-danger"></small>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-group">
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Masukkan username">
+                        <div class="input-group-append"></div>
                     </div>
+                    <small id="error-username" class="error-text text-danger"></small>
+                </div>
 
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <div class="input-group">
-                            <input type="password" id="password" name="password" class="form-control">
-                            <div class="input-group-append"></div>
-                        </div>
-                        <small id="error-password" class="error-text text-danger"></small>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-group">
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Masukkan password">
+                        <div class="input-group-append"></div>
                     </div>
+                    <small id="error-password" class="error-text text-danger"></small>
+                </div>
 
-                    <div class="row">
-                        <div class="col-4">
-                            <button type="button" class="btn btn-danger btn-block" onclick="window.history.back()">Back</button>
-                        </div>
-                        <div class="col-4">
-                            <button type="submit" class="btn btn-primary btn-block">Login</button>
-                        </div>
+                <div class="row">
+                    <div class="col-4">
+                        <button type="button" class="btn btn-danger btn-block" onclick="window.location.href='{{ url('/') }}'">Back</button>
                     </div>
-                </form>
-            </div>
+                    <div class="col-4">
+                        <button type="submit" class="btn btn-primary btn-block">Login</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -187,11 +180,11 @@
                     loginPage.style.backgroundImage = 'radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 70%), radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 70%)';
                     break;
                 case 'solid':
-                    loginPage.style.background = '#1976d2'; /* Solid blue */
+                    loginPage.style.background = '#1976d2';
                     loginPage.style.backgroundImage = 'none';
                     break;
                 case 'image':
-                    loginPage.style.background = `url('{{ asset('Login.png') }}') no-repeat center center fixed`;
+                    loginPage.style.background = `url('{{ asset('loginn/Login.png') }}') no-repeat center center fixed`;
                     loginPage.style.backgroundSize = 'cover';
                     loginPage.style.backgroundImage = 'none';
                     break;
@@ -237,6 +230,13 @@
                                     text: response.message
                                 });
                             }
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Terjadi Kesalahan',
+                                text: 'Gagal menghubungi server. Silakan coba lagi.'
+                            });
                         }
                     });
                     return false;

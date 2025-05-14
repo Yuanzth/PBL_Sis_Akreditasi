@@ -2,29 +2,48 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\UserModel;
-use App\Models\LevelModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
     public function login()
     {
-        if(Auth::check()){ // jika sudah login, maka redirect ke halaman home
+        Log::info('Accessing login page', ['authenticated' => Auth::check()]);
+        if (Auth::check()) {
             return redirect('/');
         }
+
         return view('auth.login');
     }
 
     public function postlogin(Request $request)
     {
-        if($request->ajax() || $request->wantsJson()){
+        if ($request->ajax() || $request->wantsJson()) {
+            // Validasi input
+            $validator = Validator::make($request->all(), [
+                'username' => 'required|min:4|max:20',
+                'password' => 'required|min:5|max:20',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors()
+                ], 422);
+            }
+
             $credentials = $request->only('username', 'password');
 
             if (Auth::attempt($credentials)) {
+                $request->session()->regenerate();
+                $user = Auth::user();
+                Log::info('Login successful', ['user_id' => $user->id_user, 'level_kode' => $user->level->level_kode]);
+
                 return response()->json([
                     'status' => true,
                     'message' => 'Login Berhasil',
@@ -32,10 +51,15 @@ class AuthController extends Controller
                 ]);
             }
 
+            Log::warning('Login failed', ['username' => $request->username]);
             return response()->json([
                 'status' => false,
-                'message' => 'Login Gagal'
-            ]);
+                'message' => 'Username atau kata sandi salah',
+                'msgField' => [
+                    'username' => ['Username atau kata sandi salah'],
+                    'password' => ['Username atau kata sandi salah']
+                ]
+            ], 401);
         }
 
         return redirect('login');
@@ -43,56 +67,11 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        Log::info('User logout', ['user_id' => Auth::id()]);
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('login');
-    
-    }
-
-    public function register()
-    {
-        $staffLevel = LevelModel::where('level_nama', 'Staff')->first();
-    
-        if (!$staffLevel) {
-            abort(404, 'Level Staff tidak ditemukan');
-        }
-    
-        return view('auth.register');
-    }
-    
-    public function postRegister(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'username' => 'required|string|unique:m_user,username',
-            'nama' => 'required|string|max:255',
-            'password' => 'required|string|min:5|confirmed', // Hapus validasi level_id
-        ]);
-    
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Validasi Gagal',
-                'errors' => $validator->errors(),
-            ]);
-        }
-    
-        // Cari level Staff
-        $staffLevel = LevelModel::where('level_nama', 'Staff')->firstOrFail();
-    
-        UserModel::create([
-            'username' => $request->username,
-            'nama' => $request->nama,
-            'password' => bcrypt($request->password),
-            'level_id' => $staffLevel->level_id // Set otomatis ke level Staff
-        ]);
-    
-        return response()->json([
-            'status' => true,
-            'message' => 'Registrasi Berhasil',
-            'redirect' => url('/login')
-        ]);
+        return redirect('/');
     }
 }
