@@ -24,7 +24,7 @@
     <!-- Custom CSS for Background and Form -->
     <style>
         .login-page {
-            background: url('Login.png') no-repeat center center fixed;
+            background: url('loginn/Login.png') no-repeat center center fixed;
             background-size: cover;
             position: relative;
             min-height: 100vh;
@@ -118,7 +118,7 @@
                 <a></a>
             </div>
             <div class="card-body">
-                <img src="{{ asset('logo_jti.png') }}" alt="JTI Logo" class="login-logo">
+                <img src="{{ asset('loginn/logo_jti.png') }}" alt="JTI Logo" class="login-logo">
                 <h2 class="login-box-msg"><b>Masuk Sistem</b></h2>
                 <p class="login-box-msg">Masukkan username dan password yang terdaftar di sistem</p>
 
