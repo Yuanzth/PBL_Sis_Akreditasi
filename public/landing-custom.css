@@ -1,0 +1,82 @@
+.bg-landing {
+    height: 85vh;
+    background: url('../landing_page/background/landing_page.png') no-repeat top center;  background-size: cover; margin-top: 0; padding-top: 0;
+    background-size: cover;
+    margin-top: 0;
+}
+
+.logo-jti {
+    width: 60px;
+    height: auto;
+}
+
+.nav-link-custom {
+    color: white;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 50rem;
+    font-size: 1rem;
+}
+
+.login-btn {
+    font-size: 1rem;
+    opacity: 0.55; /* nilai antara 0 (transparan) sampai 1 (penuh) */
+    transition: opacity 0.3s ease;
+}
+
+.login-btn:hover {
+    opacity: 1; /* saat hover biar kelihatan aktif */
+}
+
+.hero-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 900px;
+    padding: 0 1rem;
+}
+
+.hero-title {
+    font-size: 2rem;
+    line-height: 1.5;
+}
+
+.hero-subtitle {
+    font-size: 1.05rem;
+    font-style: italic;
+}
+
+.hero-card-wrapper {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 1.5rem;
+}
+
+.hero-card {
+    width: 550px;
+    padding: 1rem 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+}
+
+.hero-icon {
+    width: 40px;
+    margin-bottom: 0.5rem;
+}
+
+.icon-caption {
+    font-size: 0.875rem;
+}
+
+
+.bg-visi-misi {
+    height: 100vh;
+    background: url('../landing_page/background/landing_page_visi-misi.png') no-repeat top center;  background-size: cover; margin-top: 0; padding-top: 0;
+    background-size: cover;
+    margin-top: 0;
+}
