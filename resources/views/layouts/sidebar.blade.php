@@ -2,14 +2,16 @@
     <!-- SidebarSearch Form -->
     <div class="form-inline mt-2">
         <div class="input-group" data-widget="sidebar-search">
-            <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+            <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search"
+                style="background-color: #D9D9D9; color: #000;">
             <div class="input-group-append">
-                <button class="btn btn-sidebar">
-                    <i class="fas fa-search fa-fw"></i>
+                <button class="btn btn-sidebar" style="background-color: #D9D9D9;">
+                    <i class="fas fa-search fa-fw" style="color: #000;"></i>
                 </button>
             </div>
         </div>
     </div>
+
 
     <!-- Sidebar Menu -->
     <nav class="mt-2">
@@ -27,42 +29,62 @@
             @endphp
 
             @if($levelKode == 'Admin')
-            <!-- Menu Admin -->
-            <li class="nav-header">Manajemen Pengguna</li>
-            <li class="nav-item">
-                <a href="{{ url('/users') }}" class="nav-link {{ ($activeMenu == 'users') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-users"></i>
-                    <p>Data Pengguna</p>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ url('/levels') }}" class="nav-link {{ ($activeMenu == 'levels') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-layer-group"></i>
-                    <p>Level Pengguna</p>
-                </a>
-            </li>
+                <!-- Menu Admin -->
+                <li class="nav-header">Manajemen Pengguna</li>
+                <li class="nav-item">
+                    <a href="{{ url('/users') }}" class="nav-link {{ ($activeMenu == 'users') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>Data Pengguna</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/levels') }}" class="nav-link {{ ($activeMenu == 'levels') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-layer-group"></i>
+                        <p>Level Pengguna</p>
+                    </a>
+                </li>
             @endif
 
             @if(in_array($levelKode, ['Admin', 'KPS_Kajur']))
-            <!-- Menu Admin & KPS_Kajur -->
-            <li class="nav-header">Manajemen Dokumen</li>
-            <li class="nav-item">
-                <a href="{{ url('/documents') }}" class="nav-link {{ ($activeMenu == 'documents') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-file-alt"></i>
-                    <p>Dokumen Akreditasi</p>
-                </a>
-            </li>
+                <!-- Menu Admin & KPS_Kajur -->
+                <li class="nav-header">Manajemen Dokumen</li>
+                <li class="nav-item">
+                    <a href="{{ url('/documents') }}" class="nav-link {{ ($activeMenu == 'documents') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-file-alt"></i>
+                        <p>Dokumen Akreditasi</p>
+                    </a>
+                </li>
             @endif
 
             @if(in_array($levelKode, ['Admin', 'KPS_Kajur', 'KJM', 'Direktur']))
-            <!-- Menu Semua Level -->
-            <li class="nav-header">Laporan</li>
-            <li class="nav-item">
-                <a href="{{ url('/reports') }}" class="nav-link {{ ($activeMenu == 'reports') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-chart-bar"></i>
-                    <p>Laporan Akreditasi</p>
-                </a>
-            </li>
+                <!-- Menu Semua Level -->
+                 <li class="nav-item">
+                    <a href="{{ url('/profile-user') }}"
+                        class="nav-link {{ ($activeMenu == 'laporan-akreditasi') ? 'active' : '' }}">
+                        <img src="{{ asset('dashboard/icons/icon_profile_user.png') }}" alt="Icon Profile User"
+                            style="width: 18px; height: 18px; margin-right: 8px;">
+                        <p style="display: inline; color: white;">Profile User</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ url('/data-kriteria') }}"
+                        class="nav-link {{ ($activeMenu == 'data-kriteria') ? 'active' : '' }}">
+                        <img src="{{ asset('dashboard/icons/icon_data_kriteria.png') }}" alt="Icon Data Kriteria"
+                            style="width: 18px; height: 18px; margin-right: 8px;">
+                        <p style="display: inline; color: white;">Data Kriteria</p>
+                    </a>
+                </li>
+
+                 <li class="nav-item">
+                    <a href="{{ url('/validasi-data') }}"
+                        class="nav-link {{ ($activeMenu == 'validasi-data') ? 'active' : '' }}">
+                        <img src="{{ asset('dashboard/icons/icon_validasi_data.png') }}" alt="Icon Validasi Data"
+                            style="width: 18px; height: 18px; margin-right: 8px;">
+                        <p style="display: inline; color: white;">Validasi Data</p>
+                    </a>
+                </li>
+
             @endif
         </ul>
     </nav>
