@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::pattern('id', '[0-9]+'); // Pastikan parameter {id} hanya berupa angka
 
+// Rute untuk landing page (diakses tanpa login)
+Route::get('/home', [WelcomeController::class, 'index'])->name('home');
+    
 // Rute otentikasi
 
 Route::get('login', [AuthController::class, 'login'])->name('login');
