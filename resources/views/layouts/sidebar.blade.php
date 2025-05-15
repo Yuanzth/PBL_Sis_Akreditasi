@@ -43,6 +43,37 @@
             </li>
             @endif
 
+            @if($levelKode == 'Direktur')
+                        <li class="nav-item">
+                            <a href="{{ url('/profile') }}" class="nav-link {{ ($activeMenu == 'profile') ? 'active' : '' }}">
+                                <i class="fas fa-user"></i> Profile User
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('/kriteria') }}" class="nav-link {{ ($activeMenu == 'kriteria') ? 'active' : '' }}">
+                                <i class="fas fa-clipboard-list"></i> Data Kriteria
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('/validasi') }}" class="nav-link {{ ($activeMenu == 'validasi') ? 'active' : '' }}">
+                                <i class="fas fa-check-circle"></i> Validasi Data
+                            </a>
+                        </li>
+                    @endif
+                </ul>
+            </nav>
+
+            {{-- Logout sticky bottom --}}
+            <div class="logout-link">
+            <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+            </form>
+            </div>
+            </div>
+
             @if(in_array($levelKode, ['Admin', 'KPS_Kajur']))
             <!-- Menu Admin & KPS_Kajur -->
             <li class="nav-header">Manajemen Dokumen</li>
