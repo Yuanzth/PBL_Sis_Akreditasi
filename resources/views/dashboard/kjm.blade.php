@@ -1,49 +1,32 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard KJM - Sistem Akreditasi</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-        }
-        .logout-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #dc3545;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-        .logout-btn:hover {
-            background-color: #c82333;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Selamat Datang di Dashboard KJM</h1>
-        <p>Ini adalah dashboard untuk pengguna dengan level KJM.</p>
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
-            <button type="submit" class="logout-btn">Logout</button>
-        </form>
+@extends('layouts.template')
+
+@push('css')
+<style>
+.sidebar .nav-link.active {
+    background-color: #0abf78;
+    color: white;
+}
+
+.sidebar .nav-link i {
+    color: white;
+}
+</style>
+@endpush
+
+@section('content')
+<div class="container-fluid">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-success text-white">
+            <h3 class="card-title">Selamat Datang KJM</h3>
+        </div>
+        <div class="card-body">
+            <p>Ini adalah halaman dashboard khusus untuk pengguna dengan role <strong>KJM</strong>.</p>
+            <ul class="list-unstyled">
+                <li><i class="fas fa-eye"></i> Melihat data akreditasi</li>
+                <li><i class="fas fa-check-square"></i> Memverifikasi dokumen</li>
+                <li><i class="fas fa-chart-line"></i> Monitoring progres setiap unit</li>
+            </ul>
+        </div>
     </div>
-</body>
-</html>
+</div>
+@endsection
