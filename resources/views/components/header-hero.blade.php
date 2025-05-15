@@ -10,8 +10,37 @@
             <div class="d-flex align-items-center">
                 <a href="/" class="nav-link-custom">Beranda</a>
                 <a href="https://jti.polinema.ac.id" class="nav-link-custom">Website Polinema</a>
-                <a href="#" class="nav-link-custom">Denah Gedung</a>
-                <a href="#" class="nav-link-custom">Informasi</a>
+                
+                <!-- Dropdown Denah Gedung -->
+                <div class="dropdown">
+                    <a class="nav-link-custom dropdown-toggle" href="#" role="button" id="denahGedungDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Denah Gedung
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="denahGedungDropdown">
+                        <li><a class="dropdown-item" href="https://my.matterport.com/show/?m=xufa7UrDLJe">Lantai 5</a></li>
+                        <li><a class="dropdown-item" href="https://my.matterport.com/show/?m=Fj8fbnjLjQq">Lantai 6</a></li>
+                        <li><a class="dropdown-item" href="https://my.matterport.com/show/?m=fAgiViGeZaB">Lantai 7</a></li>
+                    </ul>
+                </div>
+
+                <!-- Dropdown Kriteria -->
+                <div class="dropdown">
+                    <a class="nav-link-custom dropdown-toggle" href="#" role="button" id="kriteriaDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Kriteria
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="kriteriaDropdown">
+                        <li><a class="dropdown-item" href="#">Kriteria 1</a></li>
+                        <li><a class="dropdown-item" href="#">Kriteria 2</a></li>
+                        <li><a class="dropdown-item" href="#">Kriteria 3</a></li>
+                        <li><a class="dropdown-item" href="#">Kriteria 4</a></li>
+                        <li><a class="dropdown-item" href="#">Kriteria 5</a></li>
+                        <li><a class="dropdown-item" href="#">Kriteria 6</a></li>
+                        <li><a class="dropdown-item" href="#">Kriteria 7</a></li>
+                        <li><a class="dropdown-item" href="#">Kriteria 8</a></li>
+                        <li><a class="dropdown-item" href="#">Kriteria 9</a></li>
+                    </ul>
+                </div>
+
                 <a href="/login" class="btn btn-light text-success font-weight-bold px-4 py-2 rounded-pill login-btn">Login</a>
             </div>
         </div>
