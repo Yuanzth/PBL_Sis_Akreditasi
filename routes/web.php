@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 // Rute untuk tamu (pengguna yang belum login)
 Route::middleware(['guest'])->group(function () {
-    Route::get('/', [WelcomeController::class, 'index'])->name('home');
+    Route::get('/home', [WelcomeController::class, 'index'])->name('home');
     Route::get('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/login', [AuthController::class, 'postlogin']);
 });
