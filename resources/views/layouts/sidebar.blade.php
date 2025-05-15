@@ -13,11 +13,6 @@
 
     <!-- Sidebar Menu -->
     <nav class="mt-2">
-        @php
-            $user = Auth::user();
-            $userRole = $user ? $user->getRole() : 'STF';
-        @endphp
-        
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <li class="nav-item">
                 <a href="{{ url('/') }}" class="nav-link {{ ($activeMenu == 'dashboard') ? 'active' : '' }}">
@@ -25,71 +20,47 @@
                     <p>Dashboard</p>
                 </a>
             </li>
+
+            @php
+                $user = Auth::user();
+                $levelKode = $user ? $user->level->level_kode : '';
+            @endphp
+
+            @if($levelKode == 'Admin')
+            <!-- Menu Admin -->
+            <li class="nav-header">Manajemen Pengguna</li>
             <li class="nav-item">
-                <a href="{{ url('/profile') }}" class="nav-link {{ ($activeMenu == 'profile') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-user"></i>
-                    <p>Profile</p>
+                <a href="{{ url('/users') }}" class="nav-link {{ ($activeMenu == 'users') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-users"></i>
+                    <p>Data Pengguna</p>
                 </a>
             </li>
-
-            @if($userRole == 'ADM')
-            <!-- Data Pengguna - Hanya Admin -->
-            <li class="nav-header">Data Pengguna</li>
             <li class="nav-item">
-                <a href="{{ url('/level') }}" class="nav-link {{ ($activeMenu == 'level') ? 'active' : '' }}">
+                <a href="{{ url('/levels') }}" class="nav-link {{ ($activeMenu == 'levels') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-layer-group"></i>
-                    <p>Level User</p>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ url('/user') }}" class="nav-link {{ ($activeMenu == 'user') ? 'active' : '' }}">
-                    <i class="nav-icon far fa-user"></i>
-                    <p>Data User</p>
+                    <p>Level Pengguna</p>
                 </a>
             </li>
             @endif
 
-            @if(in_array($userRole, ['ADM', 'MNG']))
-            <!-- Data Barang - Admin & Manager -->
-            <li class="nav-header">Data Barang</li>
+            @if(in_array($levelKode, ['Admin', 'KPS_Kajur']))
+            <!-- Menu Admin & KPS_Kajur -->
+            <li class="nav-header">Manajemen Dokumen</li>
             <li class="nav-item">
-                <a href="{{ url('/kategori') }}" class="nav-link {{ ($activeMenu == 'kategori') ? 'active' : '' }}">
-                    <i class="nav-icon far fa-bookmark"></i>
-                    <p>Kategori Barang</p>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ url('/barang') }}" class="nav-link {{ ($activeMenu == 'barang') ? 'active' : '' }}">
-                    <i class="nav-icon far fa-list-alt"></i>
-                    <p>Data Barang</p>
+                <a href="{{ url('/documents') }}" class="nav-link {{ ($activeMenu == 'documents') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-file-alt"></i>
+                    <p>Dokumen Akreditasi</p>
                 </a>
             </li>
             @endif
 
-            @if(in_array($userRole, ['ADM', 'MNG']))
-            <!-- Data Supplier - Admin & Manager -->
-            <li class="nav-header">Data Supplier</li>
+            @if(in_array($levelKode, ['Admin', 'KPS_Kajur', 'KJM', 'Direktur']))
+            <!-- Menu Semua Level -->
+            <li class="nav-header">Laporan</li>
             <li class="nav-item">
-                <a href="{{ url('/supplier') }}" class="nav-link {{ ($activeMenu == 'supplier') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-truck"></i>
-                    <p>Supplier Barang</p>
-                </a>
-            </li>
-            @endif
-
-            @if(in_array($userRole, ['ADM', 'MNG', 'STF']))
-            <!-- Data Transaksi - Semua Role -->
-            <li class="nav-header">Data Transaksi</li>
-            <li class="nav-item">
-                <a href="{{ url('/stok') }}" class="nav-link {{ ($activeMenu == 'stok') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-cubes"></i>
-                    <p>Stok Barang</p>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ url('/penjualan') }}" class="nav-link {{ ($activeMenu == 'penjualan') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-cash-register"></i>
-                    <p>Transaksi Penjualan</p>
+                <a href="{{ url('/reports') }}" class="nav-link {{ ($activeMenu == 'reports') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-chart-bar"></i>
+                    <p>Laporan Akreditasi</p>
                 </a>
             </li>
             @endif

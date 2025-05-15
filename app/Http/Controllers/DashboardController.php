@@ -19,7 +19,6 @@ class DashboardController extends Controller
         $level_kode = $user->level->level_kode;
         Log::info('Accessing dashboard', ['user_id' => $user->id_user, 'level_kode' => $level_kode]);
 
-        // Tentukan view berdasarkan level_kode
         $view = match ($level_kode) {
             'Admin' => 'dashboard.admin',
             'KPS_Kajur' => 'dashboard.kps_kajur',
@@ -28,6 +27,12 @@ class DashboardController extends Controller
             default => 'dashboard.default'
         };
 
-        return view($view);
+        return view($view, [
+            'breadcrumb' => (object) [
+                'title' => 'Dashboard ' . $level_kode,
+                'list' => ['Home', 'Dashboard']
+            ],
+            'activeMenu' => 'dashboard'
+        ]);
     }
 }
