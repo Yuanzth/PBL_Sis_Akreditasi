@@ -139,7 +139,7 @@
 
                 <div class="row">
                     <div class="col-4">
-                        <button type="button" class="btn btn-danger btn-block" onclick="window.location.href='{{ url('/') }}'">Back</button>
+                        <button type="button" class="btn btn-danger btn-block" onclick="window.location.href='{{ url('/home/') }}'">Back</button>
                     </div>
                     <div class="col-4">
                         <button type="submit" class="btn btn-primary btn-block">Login</button>
