@@ -25,7 +25,7 @@ class AuthController extends Controller
         if ($request->ajax() || $request->wantsJson()) {
             // Validasi input
             $validator = Validator::make($request->all(), [
-                'username' => 'required|min:4|max:20',
+                'username' => 'required|min:1|max:20',
                 'password' => 'required|min:5|max:20',
             ]);
 
