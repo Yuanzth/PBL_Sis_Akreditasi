@@ -61,6 +61,6 @@ class DetailKriteriaSeeder extends Seeder
             ['id_detail_kriteria' => 45, 'id_kriteria' => 9, 'id_kategori_kriteria' => 5],
         ];
 
-        DB::table('t_detail_kriteria')->insert($data);
+        DB::table('m_detail_kriteria')->insert($data);
     }
 }
