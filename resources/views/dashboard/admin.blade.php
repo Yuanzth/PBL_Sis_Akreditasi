@@ -5,45 +5,157 @@
     .container-fluid {
         padding: 20px;
     }
-    .card {
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        padding: 20px;
+
+    .welcome-card {
+        background: #f2f2f2;
+        border-radius: 12px;
+        padding: 15px;
         margin-bottom: 20px;
-    }
-    .card h1 {
+        font-size: 16px;
         color: #333;
-        margin-bottom: 15px;
     }
-    .card p {
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        grid-gap: 20px;
+    }
+
+    .category-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 15px;
+    }
+
+    .category-grid .info-box {
+        color: white;
+        border-radius: 10px;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 80px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .info-box-content {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .info-box-text {
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .info-box-number {
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .info-box-icon img {
+        width: 32px;
+        height: 32px;
+        opacity: 1;
+    }
+
+    .placeholder-chart {
+        background: #eee;
+        border-radius: 12px;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         color: #555;
+        font-size: 14px;
+        min-height: 500px;
     }
-    .logout-btn {
-        display: inline-block;
-        padding: 10px 20px;
-        background-color: #dc3545;
-        color: #fff;
-        text-decoration: none;
-        border-radius: 5px;
-        border: none;
-        cursor: pointer;
+
+    .penetapan {
+        background-color: #23C3D8;
     }
-    .logout-btn:hover {
-        background-color: #c82333;
+
+    .pelaksanaan {
+        background-color: #1CA7EC;
+    }
+
+    .evaluasi {
+        background-color: #787FF6;
+    }
+
+    .pengendalian {
+        background-color: #4B77BE;
+    }
+
+    .peningkatan {
+        background-color: #4555BA;
     }
 </style>
 @endpush
 
 @section('content')
 <div class="container-fluid">
-    <div class="card">
-        <h1>Selamat Datang di Dashboard Admin</h1>
-        <p>Ini adalah dashboard untuk pengguna dengan level Admin.</p>
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
-            <button type="submit" class="logout-btn">Logout</button>
-        </form>
+    <!-- Welcome Message -->
+    <div class="welcome-card">
+        Selamat Datang, Admin!
+    </div>
+
+    <!-- Dashboard Layout -->
+    <div class="dashboard-grid">
+        <!-- Left Grid -->
+        <div class="category-grid">
+            <div class="info-box penetapan">
+                <div class="info-box-content">
+                    <span class="info-box-text">Penetapan</span>
+                    <span class="info-box-number">4</span>
+                </div>
+                <span class="info-box-icon">
+                    <img src="{{ asset('dashboard/icons/icon_penetapan.png') }}" alt="Penetapan Icon">
+                </span>
+            </div>
+            <div class="info-box pelaksanaan">
+                <div class="info-box-content">
+                    <span class="info-box-text">Pelaksanaan</span>
+                    <span class="info-box-number">4</span>
+                </div>
+                <span class="info-box-icon">
+                    <img src="{{ asset('dashboard/icons/icon_pelaksanaan.png') }}" alt="Pelaksanaan Icon">
+                </span>
+            </div>
+            <div class="info-box evaluasi">
+                <div class="info-box-content">
+                    <span class="info-box-text">Evaluasi</span>
+                    <span class="info-box-number">4</span>
+                </div>
+                <span class="info-box-icon">
+                    <img src="{{ asset('dashboard/icons/icon_evaluasi.png') }}" alt="Evaluasi Icon">
+                </span>
+            </div>
+            <div class="info-box pengendalian">
+                <div class="info-box-content">
+                    <span class="info-box-text">Pengendalian</span>
+                    <span class="info-box-number">4</span>
+                </div>
+                <span class="info-box-icon">
+                    <img src="{{ asset('dashboard/icons/icon_pengendalian.png') }}" alt="Pengendalian Icon">
+                </span>
+            </div>
+            <div class="info-box peningkatan">
+                <div class="info-box-content">
+                    <span class="info-box-text">Peningkatan</span>
+                    <span class="info-box-number">4</span>
+                </div>
+                <span class="info-box-icon">
+                    <img src="{{ asset('dashboard/icons/icon_peningkatan.png') }}" alt="Peningkatan Icon">
+                </span>
+            </div>
+        </div>
+
+        <!-- Right Placeholder -->
+        <div class="placeholder-chart">
+            Bar chart seluruh kategori nanti
+        </div>
     </div>
 </div>
 @endsection
