@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,54 +19,58 @@
 
     @stack('css')
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed">
-<div class="wrapper">
-    <!-- Navbar -->
-    @include('layouts.header')
-    <!-- /.navbar -->
+    <div class="wrapper">
+        <!-- Navbar -->
+        @include('layouts.header')
+        <!-- /.navbar -->
 
-    <!-- Main Sidebar Container -->
-    <aside class="main-sidebar elevation-4" style="background-color: #0B6B4F;">
-        <!-- Brand Logo -->
-        <a href="{{ url('/') }}" class="brand-link">
-            <img src="{{ asset('landing_page/logo/logo_jti.png') }}" alt="JTI Logo" class="brand-image img-circle elevation-2">
-             <span class="brand-text font-weight-light" style="color: white;">Sistem Akreditasi SIB</span>
-        </a>
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar elevation-4"
+            style="min-height: 100vh; display: flex; flex-direction: column; background-color: #a7e6aa;">
+            <!-- Brand Logo -->
+            <a href="{{ url('/') }}" class="brand-link">
+                <img src="{{ asset('landing_page/logo/logo_jti.png') }}" alt="JTI Logo"
+                    class="brand-image img-circle elevation-2">
+                <span class="brand-text font-weight-light" style="color: rgb(0, 0, 0);">Sistem Akreditasi SIB</span>
+            </a>
 
-        <!-- Sidebar -->
-        @include('layouts.sidebar')
-        <!-- /.sidebar -->
-    </aside>
+            <!-- Sidebar -->
+            @include('layouts.sidebar')
+            <!-- /.sidebar -->
+        </aside>
 
-    <!-- Content Wrapper -->
-    <div class="content-wrapper">
-        <!-- Content Header -->
-        @include('layouts.breadcrumb')
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Content Header -->
+            @include('layouts.breadcrumb')
 
-        <!-- Main content -->
-        <section class="content">
-            @yield('content')
-        </section>
+            <!-- Main content -->
+            <section class="content">
+                @yield('content')
+            </section>
+        </div>
+
+        @include('layouts.footer')
     </div>
 
-    @include('layouts.footer')
-</div>
-
-<!-- jQuery -->
-<script src="{{ asset('adminlte/plugins/jquery/jquery.min.js') }}"></script>
-<!-- Bootstrap 4 -->
-<script src="{{ asset('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-<!-- SweetAlert2 -->
-<script src="{{ asset('adminlte/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
-<!-- AdminLTE App -->
-<script src="{{ asset('adminlte/dist/js/adminlte.min.js') }}"></script>
-<script>
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-</script>
-@stack('js')
+    <!-- jQuery -->
+    <script src="{{ asset('adminlte/plugins/jquery/jquery.min.js') }}"></script>
+    <!-- Bootstrap 4 -->
+    <script src="{{ asset('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <!-- SweetAlert2 -->
+    <script src="{{ asset('adminlte/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <!-- AdminLTE App -->
+    <script src="{{ asset('adminlte/dist/js/adminlte.min.js') }}"></script>
+    <script>
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    </script>
+    @stack('js')
 </body>
+
 </html>
