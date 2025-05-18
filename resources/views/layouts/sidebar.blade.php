@@ -1,9 +1,9 @@
+php
 <div class="sidebar">
     <!-- SidebarSearch Form -->
     <div class="form-inline mt-2">
         <div class="input-group" data-widget="sidebar-search">
-            <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search"
-                style="background-color: #D9D9D9; color: #000;">
+            <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search" style="background-color: #D9D9D9; color: #000;">
             <div class="input-group-append">
                 <button class="btn btn-sidebar" style="background-color: #D9D9D9;">
                     <i class="fas fa-search fa-fw" style="color: #000;"></i>
@@ -11,7 +11,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- Sidebar Menu -->
     <nav class="mt-2">
@@ -28,7 +27,7 @@
                 $levelKode = $user ? $user->level->level_kode : '';
             @endphp
 
-            @if($levelKode == 'Admin')
+            @if($levelKode == 'ADM')
                 <!-- Menu Admin -->
                 <li class="nav-header">Manajemen Pengguna</li>
                 <li class="nav-item">
@@ -43,60 +42,16 @@
                         <p>Level Pengguna</p>
                     </a>
                 </li>
-
-                <li class="nav-header">Profile User</li>
-                <li class="nav-item">
-                    <a href="{{ url('/users') }}" class="nav-link {{ ($activeMenu == 'users') ? 'active' : '' }}">
-                        <img src="{{ asset('dashboard/icons/icon_profile.png') }}" class="nav-icon"
-                            style="width: 18px; height: 18px;">
-                        <p>Profile User</p>
-                    </a>
-                </li>
-
                 <li class="nav-header">Manajemen Data</li>
                 <li class="nav-item">
-                    <a href="{{ url('/data-kriteria') }}"
-                        class="nav-link {{ ($activeMenu == 'data-kriteria') ? 'active' : '' }}">
-                        <img src="{{ asset('dashboard/icons/icon_data_kriteria.png') }}" class="nav-icon"
-                            style="width: 18px; height: 18px;">
+                    <a href="{{ url('/data-kriteria') }}" class="nav-link {{ ($activeMenu == 'data-kriteria') ? 'active' : '' }}">
+                        <img src="{{ asset('dashboard/icons/icon_data_kriteria.png') }}" class="nav-icon" style="width: 18px; height: 18px;">
                         <p>Data Kriteria</p>
                     </a>
                 </li>
-
             @endif
 
-            @if($levelKode == 'Direktur')
-                        <li class="nav-item">
-                            <a href="{{ url('/profile') }}" class="nav-link {{ ($activeMenu == 'profile') ? 'active' : '' }}">
-                                <i class="fas fa-user"></i> Profile User
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ url('/kriteria') }}" class="nav-link {{ ($activeMenu == 'kriteria') ? 'active' : '' }}">
-                                <i class="fas fa-clipboard-list"></i> Data Kriteria
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ url('/validasi') }}" class="nav-link {{ ($activeMenu == 'validasi') ? 'active' : '' }}">
-                                <i class="fas fa-check-circle"></i> Validasi Data
-                            </a>
-                        </li>
-                    @endif
-                </ul>
-            </nav>
-
-            {{-- Logout sticky bottom --}}
-            <div class="logout-link">
-            <form action="{{ route('logout') }}" method="POST">
-            @csrf
-            <button type="submit">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-            </form>
-            </div>
-            </div>
-
-            @if(in_array($levelKode, ['Admin', 'KPS_Kajur']))
+            @if(in_array($levelKode, ['ADM', 'KPS']))
                 <!-- Menu Admin & KPS_Kajur -->
                 <li class="nav-header">Manajemen Dokumen</li>
                 <li class="nav-item">
@@ -105,38 +60,49 @@
                         <p>Dokumen Akreditasi</p>
                     </a>
                 </li>
+                <li class="nav-item {{ ($activeMenu == 'kriteria') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ ($activeMenu == 'kriteria') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-table"></i>
+                        <p>
+                            Data Kriteria
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @for($i = 1; $i <= 9; $i++)
+                            <li class="nav-item">
+                                <a href="{{ url('/kriteria' . $i) }}" class="nav-link {{ ($activeMenu == 'kriteria' . $i) ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Kriteria {{ $i }}</p>
+                                </a>
+                            </li>
+                        @endfor
+                    </ul>
+                </li>
             @endif
 
-            @if(in_array($levelKode, ['Admin', 'KPS_Kajur', 'KJM', 'Direktur']))
+            @if(in_array($levelKode, ['ADM', 'KPS', 'KJM', 'DIR']))
                 <!-- Menu Semua Level -->
-
-                 <li class="nav-item">
-                    <a href="{{ url('/profile-user') }}"
-                        class="nav-link {{ ($activeMenu == 'laporan-akreditasi') ? 'active' : '' }}">
-                        <img src="{{ asset('dashboard/icons/icon_profile_user.png') }}" alt="Icon Profile User"
-                            style="width: 18px; height: 18px; margin-right: 8px;">
-                        <p style="display: inline; color: white;">Profile User</p>
-                    </a>
-                </li>
-
+                <li class="nav-header">Pengguna</li>
                 <li class="nav-item">
-                    <a href="{{ url('/data-kriteria') }}"
-                        class="nav-link {{ ($activeMenu == 'data-kriteria') ? 'active' : '' }}">
-                        <img src="{{ asset('dashboard/icons/icon_data_kriteria.png') }}" alt="Icon Data Kriteria"
-                            style="width: 18px; height: 18px; margin-right: 8px;">
-                        <p style="display: inline; color: white;">Data Kriteria</p>
+                    <a href="{{ url('/profile-user') }}" class="nav-link {{ ($activeMenu == 'profile-user') ? 'active' : '' }}">
+                        <img src="{{ asset('dashboard/icons/icon_profile_user.png') }}" class="nav-icon" style="width: 18px; height: 18px; margin-right: 8px;">
+                        <p>Profile User</p>
                     </a>
                 </li>
-
-                 <li class="nav-item">
-                    <a href="{{ url('/validasi-data') }}"
-                        class="nav-link {{ ($activeMenu == 'validasi-data') ? 'active' : '' }}">
-                        <img src="{{ asset('dashboard/icons/icon_validasi_data.png') }}" alt="Icon Validasi Data"
-                            style="width: 18px; height: 18px; margin-right: 8px;">
-                        <p style="display: inline; color: white;">Validasi Data</p>
+                <li class="nav-header">Data</li>
+                <li class="nav-item">
+                    <a href="{{ url('/data-kriteria') }}" class="nav-link {{ ($activeMenu == 'data-kriteria') ? 'active' : '' }}">
+                        <img src="{{ asset('dashboard/icons/icon_data_kriteria.png') }}" class="nav-icon" style="width: 18px; height: 18px; margin-right: 8px;">
+                        <p>Data Kriteria</p>
                     </a>
                 </li>
-
+                <li class="nav-item">
+                    <a href="{{ url('/validasi-data') }}" class="nav-link {{ ($activeMenu == 'validasi-data') ? 'active' : '' }}">
+                        <img src="{{ asset('dashboard/icons/icon_validasi_data.png') }}" class="nav-icon" style="width: 18px; height: 18px; margin-right: 8px;">
+                        <p>Validasi Data</p>
+                    </a>
+                </li>
                 <li class="nav-header">Laporan</li>
                 <li class="nav-item">
                     <a href="{{ url('/reports') }}" class="nav-link {{ ($activeMenu == 'reports') ? 'active' : '' }}">
@@ -147,4 +113,65 @@
             @endif
         </ul>
     </nav>
+
+    <!-- Logout Sticky Bottom -->
+    <div class="logout-link mt-auto">
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit" class="nav-link w-100 text-left" style="color: #fff; background: none; border: none;">
+                <i class="nav-icon fas fa-sign-out-alt"></i>
+                <p style="display: inline;">Logout</p>
+            </button>
+        </form>
+    </div>
 </div>
+
+@push('css')
+<style>
+    .sidebar {
+        background-color: #343a40;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+    }
+    .nav-link {
+        color: #fff !important;
+    }
+    .nav-link:hover {
+        background-color: #495057;
+    }
+    .nav-link.active {
+        background-color: #495057 !important;
+    }
+    .nav-header {
+        color: #adb5bd;
+        padding: 10px 20px;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+    .nav-treeview .nav-item {
+        padding-left: 20px;
+    }
+    .nav-treeview .nav-link {
+        color: #fff;
+    }
+    .nav-treeview .nav-link:hover {
+        background-color: #495057;
+    }
+    .nav-treeview .nav-link.active {
+        background-color: #495057;
+    }
+    .right {
+        float: right;
+        margin-top: 3px;
+    }
+    .logout-link {
+        padding: 10px 20px;
+        background-color: #343a40;
+    }
+    .logout-link button:hover {
+        background-color: #495057;
+    }
+</style>
+@endpush
