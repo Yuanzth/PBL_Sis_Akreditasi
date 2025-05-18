@@ -22,8 +22,8 @@
             </li>
 
             @php
-                $user = Auth::user();
-                $levelKode = $user ? $user->level->level_kode : '';
+            $user = Auth::user();
+            $levelKode = $user ? $user->level->level_kode : '';
             @endphp
 
             @if($levelKode == 'Admin')
@@ -52,6 +52,83 @@
                     <p>Dokumen Akreditasi</p>
                 </a>
             </li>
+              <li class="nav-item">
+                <a href="{{ url('/documents') }}" class="nav-link {{ ($activeMenu == 'documents') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-user"></i>
+                    <p>Profile User</p>
+                </a>
+            </li>
+            <li class="nav-item {{ ($activeMenu == 'kriteria') ? 'menu-open' : '' }}">
+                <a href="#" class="nav-link {{ ($activeMenu == 'kriteria') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-table"></i>
+                    <p>
+                        Data Kriteria
+                        <i class="fas fa-angle-left right"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="{{ url('/kriteria1') }}" class="nav-link {{ ($activeMenu == 'kriteria1') ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Kriteria 1</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/kriteria2') }}" class="nav-link {{ ($activeMenu == 'kriteria2') ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Kriteria 2</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/kriteria3') }}" class="nav-link {{ ($activeMenu == 'kriteria3') ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Kriteria 3</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/kriteria4') }}" class="nav-link {{ ($activeMenu == 'kriteria4') ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Kriteria 4</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/kriteria5') }}" class="nav-link {{ ($activeMenu == 'kriteria5') ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Kriteria 5</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/kriteria6') }}" class="nav-link {{ ($activeMenu == 'kriteria6') ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Kriteria 6</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/kriteria7') }}" class="nav-link {{ ($activeMenu == 'kriteria7') ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Kriteria 7</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/kriteria8') }}" class="nav-link {{ ($activeMenu == 'kriteria8') ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Kriteria 8</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/kriteria9') }}" class="nav-link {{ ($activeMenu == 'kriteria9') ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Kriteria 9</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url('/validasi-data') }}" class="nav-link {{ ($activeMenu == 'validasi') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-check-square"></i>
+                    <p>Validasi Data</p>
+                </a>
+            </li>
             @endif
 
             @if(in_array($levelKode, ['Admin', 'KPS_Kajur', 'KJM', 'Direktur']))
@@ -67,3 +144,43 @@
         </ul>
     </nav>
 </div>
+
+@push('css')
+<style>
+    .sidebar {
+        background-color: #343a40;
+        color: #fff;
+    }
+    .nav-link {
+        color: #fff !important;
+    }
+    .nav-link:hover {
+        background-color: #495057;
+    }
+    .nav-link.active {
+        background-color: #495057 !important;
+    }
+    .nav-header {
+        color: #adb5bd;
+        padding: 10px 20px;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+    .nav-treeview .nav-item {
+        padding-left: 20px;
+    }
+    .nav-treeview .nav-link {
+        color: #fff;
+    }
+    .nav-treeview .nav-link:hover {
+        background-color: #495057;
+    }
+    .nav-treeview .nav-link.active {
+        background-color: #495057;
+    }
+    .right {
+        float: right;
+        margin-top: 3px;
+    }
+</style>
+@endpush
