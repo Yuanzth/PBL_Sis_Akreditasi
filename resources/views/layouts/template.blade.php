@@ -25,11 +25,11 @@
     <!-- /.navbar -->
 
     <!-- Main Sidebar Container -->
-    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <aside class="main-sidebar elevation-4" style="background-color: #0B6B4F;">
         <!-- Brand Logo -->
         <a href="{{ url('/') }}" class="brand-link">
             <img src="{{ asset('landing_page/logo/logo_jti.png') }}" alt="JTI Logo" class="brand-image img-circle elevation-2">
-            <span class="brand-text font-weight-light">Sistem Akreditasi SIB</span>
+             <span class="brand-text font-weight-light" style="color: white;">Sistem Akreditasi SIB</span>
         </a>
 
         <!-- Sidebar -->
