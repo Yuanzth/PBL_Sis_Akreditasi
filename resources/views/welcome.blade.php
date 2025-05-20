@@ -59,6 +59,7 @@
         @include('components.header-hero')
         @include('components.profile')
         @include('components.visi-misi')
+        @include('components.tujuan')
         @include('components.footer')
 
         <!-- Bootstrap JS -->
