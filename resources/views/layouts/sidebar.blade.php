@@ -29,7 +29,7 @@
                                   background-color: {{ ($activeMenu == 'dashboard') ? '#2196F3' : 'transparent' }};"
                             onmouseover="this.style.backgroundColor='#4CAF50'; this.style.color='#FFFFFF';"
                             onmouseout="this.style.backgroundColor='{{ ($activeMenu == 'dashboard') ? '#2196F3' : 'transparent' }}'; this.style.color='#FFFFFF';">
-                            <i class="nav-icon fas fa-tachometer-alt" style="color: #FFFFFF; margin-right: 10px;"></i>
+                            <i class="nav-icon fas fa-tachometer-alt" style="color: #FFFFFF; margin-right: 15px;"></i>
                             <p style="color: #FFFFFF; margin: 0;">Dashboard</p>
                         </a>
                     </li>
@@ -39,7 +39,7 @@
                                   background-color: {{ ($activeMenu == 'profile-user') ? '#2196F3' : 'transparent' }};"
                             onmouseover="this.style.backgroundColor='#4CAF50'; this.style.color='#FFFFFF';"
                             onmouseout="this.style.backgroundColor='{{ ($activeMenu == 'profile-user') ? '#2196F3' : 'transparent' }}'; this.style.color='#FFFFFF';">
-                            <i class="nav-icon fas fa-user" style="color: #FFFFFF; margin-right: 10px;"></i>
+                            <i class="nav-icon fas fa-user" style="color: #FFFFFF; margin-right: 15px;"></i>
                             <p style="color: #FFFFFF; margin: 0;">Profile User</p>
                         </a>
                     </li>
@@ -67,7 +67,7 @@
                                                   background-color: {{ ($activeMenu == 'kriteria') ? '#2196F3' : 'transparent' }};"
                                 onmouseover="this.style.backgroundColor='#4CAF50'; this.style.color='#FFFFFF';"
                                 onmouseout="this.style.backgroundColor='{{ ($activeMenu == 'kriteria') ? '#2196F3' : 'transparent' }}'; this.style.color='#FFFFFF';">
-                                <i class="nav-icon fas fa-table" style="color: #FFFFFF; margin-right: 10px;"></i>
+                                <i class="nav-icon fas fa-table" style="color: #FFFFFF; margin-right: 15px;"></i>
                                 <p style="color: #FFFFFF; margin: 0;">
                                     Data Kriteria
                                     <i class="fas fa-angle-left right"
@@ -85,13 +85,13 @@
                                                                                           background-color: {{ ($activeMenu == 'kriteria' . $i) ? '#2196F3' : 'transparent' }};"
                                                 onmouseover="this.style.backgroundColor='#4CAF50'; this.style.color='#FFFFFF';"
                                                 onmouseout="this.style.backgroundColor='{{ ($activeMenu == 'kriteria' . $i) ? '#2196F3' : 'transparent' }}'; this.style.color='#FFFFFF';">
-                                                <i class="far fa-circle nav-icon" style="color: #FFFFFF; margin-right: 8px;"></i>
+                                                <i class="far fa-circle nav-icon" style="color: #FFFFFF; margin-right: 12px;"></i>
                                                 <p style="color: #FFFFFF; margin: 0;">Kriteria {{ $i }}</p>
                                             </a>
                                         @else
                                             <a href="#" class="nav-link disabled"
                                                 style="color: #B0BEC5; padding: 8px 15px; display: flex; align-items: center; cursor: not-allowed; opacity: 0.5;">
-                                                <i class="far fa-circle nav-icon" style="color: #B0BEC5; margin-right: 8px;"></i>
+                                                <i class="far fa-circle nav-icon" style="color: #B0BEC5; margin-right: 12px;"></i>
                                                 <p style="color: #B0BEC5; margin: 0;">Kriteria {{ $i }}</p>
                                             </a>
                                         @endif
@@ -166,8 +166,8 @@
             onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
             onmouseover="this.style.backgroundColor='#4CAF50'; this.style.color='#FFFFFF';"
             onmouseout="this.style.backgroundColor='transparent'; this.style.color='#FFFFFF';">
-            <i class="nav-icon fas fa-sign-out-alt" style="color: #FFFFFF; margin-right: 10px;"></i>
-            <p style="color: #FFFFFF; margin: 0;">Logout</p>
+            <i class="nav-icon fas fa-sign-out-alt" style="color: #FFFFFF; margin-right: 15px;"></i>
+            <p style="color: #FFFFFF; margin:0 ;">Logout</p>
         </a>
         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
             @csrf
