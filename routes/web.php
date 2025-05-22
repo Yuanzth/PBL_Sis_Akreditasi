@@ -20,7 +20,9 @@ Route::middleware(['guest'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/validasitahapsatu', [ValidasiTahapSatuController::class, 'index']);  // menampilkan halaman awal user
+    Route::get('/validasitahapsatu', [ValidasiTahapSatuController::class, 'index']);  // menampilkan halaman awal u
+    Route::post('/validasitahapsatu/list', [ValidasiTahapSatuController::class, 'list']);
+});
 
     // Rute untuk Admin Kriteria (pengerjaan kriteria)
     Route::prefix('kriteria')->group(function () {
