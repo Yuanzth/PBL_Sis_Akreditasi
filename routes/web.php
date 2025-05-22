@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ValidasiTahapSatuController;
 use App\Http\Controllers\WelcomeController;
+use App\Http\Controllers\ValidasiKJMController;
+use App\Http\Controllers\ValidasiDirController;
 use Illuminate\Support\Facades\Route;
 
 // Rute untuk tamu (pengguna yang belum login)
@@ -20,5 +22,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/validasitahapsatu', [ValidasiTahapSatuController::class, 'index']);  // menampilkan halaman awal user
 });
 
-
-    
+// Rute untuk KJM
+Route::middleware(['auth'])->group(function () {
+    Route::get('/validasi-data', [ValidasiKJMController::class, 'index']);
+    Route::get('/validasi-data/{id}/lihat', [ValidasiKJMController::class, 'show']);
+    Route::put('/validasi-data/{id}/update', [ValidasiKJMController::class, 'updateStatus']);
+});
+// Rute untuk DIR
+Route::middleware(['auth'])->group(function () {
+    Route::get('/validasi-data', [ValidasiDirController::class, 'index']);
+    Route::get('/validasi-data/{id}/lihat', [ValidasiDirController::class, 'show']);
+    Route::put('/validasi-data/{id}/update', [ValidasiDirController::class, 'updateStatus']);
+});
+});
