@@ -14,6 +14,7 @@ return new class extends Migration
             $table->text('deskripsi_data');
             $table->text('nama_data');
             $table->text('hyperlink_data')->nullable();
+            $table->boolean('draft')->default(true);
             $table->timestamps();
             
             $table->foreign('id_detail_kriteria')->references('id_detail_kriteria')->on('m_detail_kriteria');
