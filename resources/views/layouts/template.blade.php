@@ -16,12 +16,11 @@
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('adminlte/dist/css/adminlte.min.css') }}">
-
     @stack('css')
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
+    <div class="wrapper" style="display: flex; flex-direction: column; min-height: 100vh;">
         <!-- Navbar -->
         @include('layouts.header')
         <!-- /.navbar -->
@@ -42,7 +41,7 @@
         </aside>
 
         <!-- Content Wrapper -->
-        <div class="content-wrapper">
+        <div class="content-wrapper" style="flex: 1 0 auto;">
             <!-- Content Header -->
             @include('layouts.breadcrumb')
 
@@ -52,6 +51,7 @@
             </section>
         </div>
 
+        <!-- Footer -->
         @include('layouts.footer')
     </div>
 
@@ -63,6 +63,9 @@
     <script src="{{ asset('adminlte/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
     <!-- AdminLTE App -->
     <script src="{{ asset('adminlte/dist/js/adminlte.min.js') }}"></script>
+    <!-- CKEditor 5 CDN -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.umd.js"></script>
+
     <script>
         $.ajaxSetup({
             headers: {
@@ -70,7 +73,9 @@
             }
         });
     </script>
+
     @stack('js')
 </body>
 
 </html>
+?>

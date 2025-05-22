@@ -12,9 +12,8 @@ return new class extends Migration
             $table->id('id_validasi');
             $table->unsignedBigInteger('id_user');
             $table->unsignedBigInteger('id_kriteria');
-            $table->date('tanggal');
-            $table->text('status');
-            $table->timestamps();
+            $table->string('status', 20); // Diubah dari text ke string(20)
+            $table->timestamps(); // created_at dan updated_at (digunakan sebagai tanggal)
             
             $table->foreign('id_user')->references('id_user')->on('m_user');
             $table->foreign('id_kriteria')->references('id_kriteria')->on('m_kriteria');

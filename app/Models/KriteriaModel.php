@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Model;
 
 class KriteriaModel extends Model
@@ -12,7 +10,7 @@ class KriteriaModel extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->belongsTo(UserModel::class, 'id_user');
     }
 
     public function detailKriteria()
@@ -22,7 +20,7 @@ class KriteriaModel extends Model
 
     public function validasi()
     {
-        return $this->hasOne(ValidasiModel::class, 'id_kriteria');
+        return $this->hasMany(ValidasiModel::class, 'id_kriteria');
     }
 
     public function komentar()

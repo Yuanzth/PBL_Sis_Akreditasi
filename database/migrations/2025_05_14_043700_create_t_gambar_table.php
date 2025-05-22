@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id('id_gambar');
             $table->unsignedBigInteger('id_data_pendukung');
             $table->text('gambar');
+            $table->boolean('draft')->default(true);
             
             $table->foreign('id_data_pendukung')->references('id_data_pendukung')->on('t_data_pendukung');
         });

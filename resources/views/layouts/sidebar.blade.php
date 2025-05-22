@@ -2,7 +2,7 @@
     style="height: 100vh; background-color: #2E7D32; color: white; padding: 15px; overflow-x: hidden;">
     <!-- SidebarSearch Form -->
     <div class="form-inline mt-2">
-        <div class="input-group" data-widget="sidebar-search">
+        {{-- <div class="input-group" data-widget="sidebar-search">
             <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search"
                 style="background-color: #D9D9D9; color: #000;">
             <div class="input-group-append">
@@ -10,7 +10,7 @@
                     <i class="fas fa-search fa-fw" style="color: #000;"></i>
                 </button>
             </div>
-        </div>
+        </div> --}}
         <!-- Menu Wrapper -->
         <div class="menu-wrapper d-flex flex-column flex-grow-1" style="overflow-x: hidden;">
 
@@ -79,7 +79,7 @@
                                 @for($i = 1; $i <= 9; $i++)
                                     <li class="nav-item" style="padding-left: 15px; margin: 5px 0;">
                                         @if($kriteriaId == $i)
-                                            <a href="{{ url('/kriteria' . $i) }}"
+                                            <a href="{{ url('/kriteria/' . $i) }}"
                                                 class="nav-link {{ ($activeMenu == 'kriteria' . $i) ? 'active' : '' }}"
                                                 style="color: #FFFFFF; padding: 8px 15px; display: flex; align-items: center; 
                                                                                           background-color: {{ ($activeMenu == 'kriteria' . $i) ? '#2196F3' : 'transparent' }};"

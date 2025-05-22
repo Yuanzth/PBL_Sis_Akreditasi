@@ -15,8 +15,8 @@ class DatabaseSeeder extends Seeder
             KategoriKriteriaSeeder::class,
             DetailKriteriaSeeder::class,
             DataPendukungSeeder::class,
-            KomentarSeeder::class,
-            ValidasiSeeder::class,
+            // KomentarSeeder::class,
+            // ValidasiSeeder::class,
         ]);
     }
 }
