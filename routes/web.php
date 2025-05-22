@@ -8,19 +8,23 @@ use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\ValidasiKJMController;
 use App\Http\Controllers\ValidasiDirController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 
 // Rute untuk tamu (pengguna yang belum login)
 Route::middleware(['guest'])->group(function () {
     Route::get('/home', [WelcomeController::class, 'index'])->name('home');
     Route::get('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/login', [AuthController::class, 'postlogin']);
+    
 });
 
 // Rute untuk pengguna yang sudah login
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/validasitahapsatu', [ValidasiTahapSatuController::class, 'index']);  // menampilkan halaman awal u
+    Route::get('/profile', [UserController::class, 'profile']);
+    Route::post('/updatephoto', [UserController::class, 'updatePhoto']);
+    Route::get('/validasitahapsatu', [ValidasiTahapSatuController::class, 'index']);  // menampilkan halaman awal user
     Route::post('/validasitahapsatu/list', [ValidasiTahapSatuController::class, 'list']);
 });
 
@@ -43,4 +47,4 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/validasi-data', [ValidasiDirController::class, 'index']);
     Route::get('/validasi-data/{id}/lihat', [ValidasiDirController::class, 'show']);
     Route::put('/validasi-data/{id}/update', [ValidasiDirController::class, 'updateStatus']);
-});
+
