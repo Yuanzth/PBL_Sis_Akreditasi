@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ValidasiTahapSatuController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ValidasiKJMController;
 use App\Http\Controllers\ValidasiDirController;
@@ -18,6 +19,8 @@ Route::middleware(['guest'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/validasitahapsatu', [ValidasiTahapSatuController::class, 'index']);  // menampilkan halaman awal user
+});
 
 // Rute untuk KJM
 Route::middleware(['auth'])->group(function () {

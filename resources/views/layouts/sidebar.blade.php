@@ -108,7 +108,7 @@
                             Validasi
                         </li>
                         <li class="nav-item" style="margin: 5px 0;">
-                            <a href="{{ url('/validasi-data') }}"
+                            <a href="{{ url('/validasitahapsatu') }}"
                                 class="nav-link {{ ($activeMenu == 'validasi-data') ? 'active' : '' }}"
                                 style="color: #FFFFFF; padding: 10px 15px; display: flex; align-items: center; 
                                                   background-color: {{ ($activeMenu == 'validasi-data') ? '#2196F3' : 'transparent' }};"
