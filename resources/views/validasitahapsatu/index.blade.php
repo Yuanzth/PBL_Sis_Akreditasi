@@ -3,11 +3,7 @@
 @section('content')
 <div class="card card-outline card-primary">
     <div class="card-header">
-        <h3 class="card-title">Kriteria 1</h3>
-        <div class="card-tools">
-            <!-- Add buttons as needed, e.g., for export or adding data -->
-            <button onclick="modalAction('{{ url('/kriteria/create_ajax/') }}')" class="btn btn-success">Tambah Data (Ajax)</button>
-        </div>
+        <h3 class="card-title">Validasi Tahap Satu</h3>
     </div>
     <div class="card-body">
         @if (session('success'))
@@ -16,16 +12,30 @@
         @if (session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
-        <table class="table table-bordered table-striped table-hover table-sm" id="table_kriteria">
+        <!-- Filter and Search Section -->
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label for="filter_status">Status Validasi</label>
+                <select id="filter_status" class="form-control">
+                    <option value="">Semua Status</option>
+                    <option value="Valid">Valid</option>
+                    <option value="Ditolak">Ditolak</option>
+                    <option value="On Progress">On Progress</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="search_global">Pencarian</label>
+                <input type="text" id="search_global" class="form-control" placeholder="Cari...">
+            </div>
+        </div>
+        <table class="table table-bordered table-striped table-hover table-sm" id="table_validasi">
             <thead>
                 <tr>
                     <th>No</th>
-                    <th>ID</th>
-                    <th>Kategori Kriteria</th>
-                    <th>Nama Data</th>
-                    <th>Tanggal Upload</th>
-                    <th>URL Data Pendukung</th>
+                    <th>Nama Kriteria</th>
+                    <th>Tanggal Submit</th>
                     <th>Status Validasi</th>
+                    <th>Divalidasi Oleh</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -50,16 +60,6 @@
         color: #fd7e14;
         font-weight: bold;
     }
-    .btn-file {
-        padding: 5px 10px;
-        background-color: #28a745;
-        color: #fff;
-        text-decoration: none;
-        border-radius: 3px;
-    }
-    .btn-file:hover {
-        background-color: #218838;
-    }
     .btn-detail {
         padding: 5px 10px;
         background-color: #007bff;
@@ -76,20 +76,59 @@
 @push('js')
 <script>
     function modalAction(url = '') {
-        $('#myModal').load(url, function() {
-            $('#myModal').modal('show');
-        });
+        if (url) {
+            $('#myModal').load(url, function() {
+                $('#myModal').modal('show');
+            });
+        }
+    }
+
+    function showDetail(url) {
+        modalAction(url);
+    }
+
+    function approveAction(url) {
+        if (confirm('Apakah Anda yakin ingin menyetujui data ini?')) {
+            $.post(url, {_token: '{{ csrf_token() }}'}, function(data) {
+                if (data.status) {
+                    $('#table_validasi').DataTable().ajax.reload();
+                    alert(data.message);
+                } else {
+                    alert(data.message);
+                }
+            });
+        }
+    }
+
+    function rejectAction(url) {
+        if (confirm('Apakah Anda yakin ingin menolak data ini?')) {
+            $.post(url, {_token: '{{ csrf_token() }}'}, function(data) {
+                if (data.status) {
+                    $('#table_validasi').DataTable().ajax.reload();
+                    alert(data.message);
+                } else {
+                    alert(data.message);
+                }
+            });
+        }
+    }
+
+    function notesAction(url) {
+        modalAction(url);
     }
 
     $(document).ready(function() {
-        var dataKriteria = $('#table_kriteria').DataTable({
+        var dataValidasi = $('#table_validasi').DataTable({
             serverSide: true,
             ajax: {
-                "url": "{{ url('kriteria/list') }}",
+                "url": "{{ url('validasi-tahap-satu/list') }}",
                 "dataType": "json",
                 "type": "POST",
                 "data": function(d) {
-                    d.kriteria_id = $('#kriteria_id').val();
+                    d.nama_kriteria = $('#filter_kriteria').val();
+                    d.status_validasi = $('#filter_status').val();
+                    d.divalidasi_oleh = $('#filter_user').val();
+                    d.search_global = $('#search_global').val();
                 }
             },
             columns: [{
@@ -99,28 +138,16 @@
                 orderable: false,
                 searchable: false
             }, {
-                // ID
-                data: "id",
-                className: "",
-                orderable: true,
-                searchable: true
-            }, {
-                // Kategori Kriteria (Hardcoded as "Penetapan" per the image)
-                data: "kategori_kriteria",
+                // Nama Kriteria (from m_kriteria)
+                data: "nama_kriteria",
                 className: "",
                 orderable: true,
                 searchable: true,
                 render: function(data, type, row) {
-                    return "Penetapan"; // Adjust if this is dynamic in your database
+                    return data ? data : '-';
                 }
             }, {
-                // Nama Data (from kriteria table)
-                data: "nama_kriteria",
-                className: "",
-                orderable: true,
-                searchable: true
-            }, {
-                // Tanggal Upload (from validasi table)
+                // Tanggal Submit (from t_validasi)
                 data: "tanggal_submit",
                 className: "",
                 orderable: true,
@@ -129,19 +156,7 @@
                     return data ? data : '-';
                 }
             }, {
-                // URL Data Pendukung (from validasi table)
-                data: "status_submit",
-                className: "",
-                orderable: false,
-                searchable: false,
-                render: function(data, type, row) {
-                    if (data) {
-                        return '<a href="' + data + '" target="_blank" class="btn-file">Lihat File</a>';
-                    }
-                    return '-';
-                }
-            }, {
-                // Status Validasi (from validasi table)
+                // Status Validasi (from t_validasi)
                 data: "status_validasi",
                 className: "",
                 orderable: true,
@@ -157,16 +172,45 @@
                     return '-';
                 }
             }, {
+                // Divalidasi Oleh (from m_user via id_user in t_validasi)
+                data: "divalidasi_oleh",
+                className: "",
+                orderable: true,
+                searchable: true,
+                render: function(data, type, row) {
+                    return data ? data : '-';
+                }
+            }, {
                 // Aksi
                 data: "aksi",
-                className: "",
+                className: "text-center",
                 orderable: false,
                 searchable: false
-            }]
+            }],
+            language: {
+                emptyTable: "Tidak ada data yang tersedia di tabel",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                infoEmpty: "Menampilkan 0 sampai 0 dari 0 entri",
+                loadingRecords: "Memuat...",
+                processing: "Sedang memproses...",
+                search: "Cari:",
+                zeroRecords: "Tidak ada data yang ditemukan",
+                paginate: {
+                    first: "Pertama",
+                    last: "Terakhir",
+                    next: "Selanjutnya",
+                    previous: "Sebelumnya"
+                }
+            }
         });
 
-        $('#kriteria_id').on('change', function() {
-            dataKriteria.ajax.reload();
+        // Handle filter and search events
+        $('#filter_kriteria, #filter_status, #filter_user').on('change', function() {
+            dataValidasi.ajax.reload();
+        });
+
+        $('#search_global').on('keyup', function() {
+            dataValidasi.ajax.reload();
         });
     });
 </script>

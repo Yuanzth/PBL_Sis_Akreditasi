@@ -20,6 +20,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/validasitahapsatu', [ValidasiTahapSatuController::class, 'index']);  // menampilkan halaman awal user
+    Route::post('/validasitahapsatu/list', [ValidasiTahapSatuController::class, 'list']);
 });
 
 // Rute untuk KJM
@@ -33,5 +34,4 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/validasi-data', [ValidasiDirController::class, 'index']);
     Route::get('/validasi-data/{id}/lihat', [ValidasiDirController::class, 'show']);
     Route::put('/validasi-data/{id}/update', [ValidasiDirController::class, 'updateStatus']);
-});
 });
