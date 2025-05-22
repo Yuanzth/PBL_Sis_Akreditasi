@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ValidasiTahapSatuController;
 use App\Http\Controllers\WelcomeController;
+use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\ValidasiKJMController;
 use App\Http\Controllers\ValidasiDirController;
 use Illuminate\Support\Facades\Route;
@@ -19,10 +20,18 @@ Route::middleware(['guest'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/validasitahapsatu', [ValidasiTahapSatuController::class, 'index']);  // menampilkan halaman awal user
+    Route::get('/validasitahapsatu', [ValidasiTahapSatuController::class, 'index']);  // menampilkan halaman awal u
     Route::post('/validasitahapsatu/list', [ValidasiTahapSatuController::class, 'list']);
 });
 
+    // Rute untuk Admin Kriteria (pengerjaan kriteria)
+    Route::prefix('kriteria')->group(function () {
+        Route::get('{id}', [KriteriaController::class, 'edit'])->name('kriteria.edit');
+        Route::post('{id}/save', [KriteriaController::class, 'save'])->name('kriteria.save');
+        Route::post('{id}/submit', [KriteriaController::class, 'submit'])->name('kriteria.submit');
+        Route::delete('{id}/data/{dataId}', [KriteriaController::class, 'deleteData'])->name('kriteria.deleteData');
+    });
+});
 // Rute untuk KJM
 Route::middleware(['auth'])->group(function () {
     Route::get('/validasi-data', [ValidasiKJMController::class, 'index']);
