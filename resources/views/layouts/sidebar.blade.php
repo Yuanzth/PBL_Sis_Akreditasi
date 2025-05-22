@@ -34,7 +34,7 @@
                         </a>
                     </li>
                     <li class="nav-item" style="margin: 5px 0;">
-                        <a href="{{ url('/profile-user') }}"
+                        <a href="{{ url('/profile') }}"
                             class="nav-link {{ ($activeMenu == 'profile-user') ? 'active' : '' }}" style="color: #FFFFFF; padding: 10px 15px; display: flex; align-items: center; 
                                   background-color: {{ ($activeMenu == 'profile-user') ? '#2196F3' : 'transparent' }};"
                             onmouseover="this.style.backgroundColor='#4CAF50'; this.style.color='#FFFFFF';"
