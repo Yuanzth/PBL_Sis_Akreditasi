@@ -7,6 +7,7 @@ use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\ValidasiKJMController;
 use App\Http\Controllers\ValidasiDirController;
+use App\Http\Controllers\FinalDocumentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 
@@ -35,16 +36,22 @@ Route::middleware(['auth'])->group(function () {
         Route::post('{id}/submit', [KriteriaController::class, 'submit'])->name('kriteria.submit');
         Route::delete('{id}/data/{dataId}', [KriteriaController::class, 'deleteData'])->name('kriteria.deleteData');
     });
-});
+
 // Rute untuk KJM
 Route::middleware(['auth'])->group(function () {
     Route::get('/validasi-data', [ValidasiKJMController::class, 'index']);
     Route::get('/validasi-data/{id}/lihat', [ValidasiKJMController::class, 'show']);
     Route::put('/validasi-data/{id}/update', [ValidasiKJMController::class, 'updateStatus']);
+    Route::get('/finalisasi-dokumen', [FinalDocumentController::class, 'index'])->name('finalisasi.index');
+    Route::get('/finalisasi', [FinalDocumentController::class, 'index'])->name('finalisasi.index');
+    Route::get('/finalisasi/export-pdf', [FinalDocumentController::class, 'exportPdf'])->name('finalisasi.export.pdf');
 });
 // Rute untuk DIR
 Route::middleware(['auth'])->group(function () {
     Route::get('/validasi-data', [ValidasiDirController::class, 'index']);
     Route::get('/validasi-data/{id}/lihat', [ValidasiDirController::class, 'show']);
     Route::put('/validasi-data/{id}/update', [ValidasiDirController::class, 'updateStatus']);
-
+        Route::get('/finalisasi-dokumen', [FinalDocumentController::class, 'index'])->name('finalisasi.index');
+    Route::get('/finalisasi', [FinalDocumentController::class, 'index'])->name('finalisasi.index');
+    Route::get('/finalisasi/export-pdf', [FinalDocumentController::class, 'exportPdf'])->name('finalisasi.export.pdf');
+});

@@ -14,4 +14,9 @@ class FinalDocumentModel extends Model
     {
         return $this->belongsTo(User::class, 'id_user');
     }
+
+    public function validasi()
+    {
+        return $this->belongsTo(ValidasiModel::class, 'id_validasi');
+    }
 }
