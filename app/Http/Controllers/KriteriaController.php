@@ -45,7 +45,7 @@ class KriteriaController extends Controller
             'detailKriteria' => $detailKriteria,
             'komentar' => $komentar,
             'breadcrumb' => (object) [
-                'title' => 'Pengerjaan Kriteria ' . $id,
+                'title' => 'Kriteria ' . $id,
                 'list' => ['Home', 'Dashboard', 'Kriteria ' . $id]
             ],
             'activeMenu' => 'kriteria' . $id
@@ -107,9 +107,9 @@ class KriteriaController extends Controller
             DataPendukungModel::whereIn('id_detail_kriteria', $detailKriteriaIds)->where('draft', true)->update(['draft' => false]);
             GambarModel::whereIn('id_data_pendukung', function ($query) use ($detailKriteriaIds) {
                 $query->select('id_data_pendukung')
-                      ->from('t_data_pendukung')
-                      ->whereIn('id_detail_kriteria', $detailKriteriaIds)
-                      ->where('draft', true);
+                    ->from('t_data_pendukung')
+                    ->whereIn('id_detail_kriteria', $detailKriteriaIds)
+                    ->where('draft', true);
             })->update(['draft' => false]);
             Log::info('Data pendukung disimpan final untuk id_kriteria: ' . $id, ['user_id' => Auth::user()->id_user]);
         } else {
@@ -162,14 +162,19 @@ class KriteriaController extends Controller
                 );
 
                 // Proses upload gambar
-                if (isset($data['gambar']) && $request->hasFile("data_pendukung.{$categoryIndex}.{$dataIndex}.gambar")) {
-                    foreach ($data['gambar'] as $file) {
-                        $path = $file->store('gambar', 'public');
+                if ($request->hasFile("data_pendukung.{$categoryIndex}.{$dataIndex}.gambar")) {
+                    Log::info('Files received for processing', ['files' => $request->file("data_pendukung.{$categoryIndex}.{$dataIndex}.gambar")]);
+                    foreach ($request->file("data_pendukung.{$categoryIndex}.{$dataIndex}.gambar") as $file) {
+                        $path = $file->store('gambar/draft', 'public');
                         GambarModel::create([
                             'id_data_pendukung' => $dataPendukung->id_data_pendukung,
-                            'gambar' => $path
+                            'gambar' => $path,
+                            'draft' => true
                         ]);
+                        Log::info('Gambar disimpan', ['path' => $path, 'id_data_pendukung' => $dataPendukung->id_data_pendukung]);
                     }
+                } else {
+                    Log::warning('No files received for processing', ['categoryIndex' => $categoryIndex, 'dataIndex' => $dataIndex]);
                 }
             }
         }
@@ -213,5 +218,22 @@ class KriteriaController extends Controller
 
         return response()->json(['message' => 'Data berhasil dihapus']);
     }
+
+    /**
+     * Menghapus draft gambar yang diupload 
+     */
+    public function deleteGambar(Request $request, $id, $gambarId)
+    {
+        $kriteria = KriteriaModel::where('id_kriteria', $id)
+            ->where('id_user', Auth::user()->id_user)
+            ->firstOrFail();
+
+        $gambar = GambarModel::findOrFail($gambarId);
+        Storage::disk('public')->delete($gambar->gambar);
+        $gambar->delete();
+
+        Log::info('Gambar dihapus untuk id_kriteria: ' . $id, ['user_id' => Auth::user()->id_user, 'id_gambar' => $gambarId]);
+
+        return response()->json(['message' => 'Gambar berhasil dihapus']);
+    }
 }
-?>

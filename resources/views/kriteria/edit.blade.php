@@ -30,7 +30,7 @@
     .data-pendukung-card {
         display: inline-block;
         margin: 10px;
-        padding: 15px;
+        padding: 15px;  
         background: #fff;
         border-radius: 8px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -55,6 +55,17 @@
         border: 1px solid #ddd;
         border-radius: 10px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        width: 75%
+    }
+    .data-pendukung-form-add {
+        display: none;
+        margin-top: 15px;
+        background: #fff;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        width: 100%
     }
     .form-row {
         display: flex;
@@ -140,28 +151,37 @@
 
             const dropzone = new Dropzone(element, {
                 url: "{{ route('kriteria.save', ['id' => $kriteria->id_kriteria]) }}",
-                paramName: `data_pendukung[${categoryIndex}][${dataIndex}][gambar]`,
+                paramName: `data_pendukung[${categoryIndex}][${dataIndex}][gambar][]`, // Pastikan array untuk multiple files
                 maxFilesize: 2,
                 acceptedFiles: 'image/jpeg,image/png,image/jpg',
                 addRemoveLinks: true,
-                dictDefaultMessage: 'Seret gambar atau klik untuk upload',
+                dictDefaultMessage: '+ Seret gambar atau klik untuk upload',
                 autoProcessQueue: false,
                 init: function () {
                     this.on('addedfile', function (file) {
                         if (file.previewElement) {
                             file.previewElement.addEventListener('load', function () {
-                                file.previewElement.style.display = 'block';
+                            file.previewElement.style.display = 'block';
                             });
                         }
                     });
                     this.on('sending', function (file, xhr, formData) {
                         formData.append('_token', '{{ csrf_token() }}');
                         const inputs = document.getElementById(formId).querySelectorAll('input:not([type="file"]), textarea');
-                        inputs.forEach(input => formData.append(input.name, input.value));
+                        inputs.forEach(input => {
+                            if (input.name.includes('data_pendukung')) {
+                                formData.append(input.name, input.value);
+                            }
+                        });
                         if (dataId) formData.append('id_data_pendukung', dataId);
                     });
-                    this.on('success', function (file, response) {
-                        // Handle success
+                    this.on('queuecomplete', function () {
+                    // Pastikan semua file sudah diproses sebelum mengirim
+                        const form = document.getElementById(formId);
+                        const formData = new FormData(form);
+                        formData.append('_token', '{{ csrf_token() }}');
+                        formData.append('draft', '1');
+                        sendFormData(formData, form);
                     });
                 }
             });
@@ -240,34 +260,23 @@
                 e.preventDefault();
                 const form = saveBtn.closest('form');
                 const formId = form.id;
-                
-                // Sinkronkan data CKEditor ke textarea
-                const editor = editors.get(formId);
-                if (editor) {
-                    const textarea = form.querySelector('.ckeditor');
-                    textarea.value = editor.getData();
-                }
-
+            // Sinkronkan CKEditor
+            const editor = editors.get(formId);
+            if (editor) {
+                const textarea = form.querySelector('.ckeditor');
+                textarea.value = editor.getData();
+            }
+            // Proses Dropzone
+            const dropzone = dropzones.get(formId);
+            if (dropzone && dropzone.files.length > 0) {
+                dropzone.processQueue();
+            } else {
                 const formData = new FormData(form);
                 formData.append('_token', '{{ csrf_token() }}');
                 formData.append('draft', '1');
-
-                // Proses unggahan Dropzone
-                const dropzone = dropzones.get(formId);
-                if (dropzone && dropzone.files.length > 0) {
-                    dropzone.processQueue();
-                } else {
-                    // Jika tidak ada file, langsung kirim form
-                    sendFormData(formData, form);
+                sendFormData(formData, form);
                 }
-
-                // Listener untuk Dropzone setelah semua file diunggah
-                if (dropzone) {
-                    dropzone.on('queuecomplete', function () {
-                        sendFormData(formData, form);
-                    });
-                }
-            }
+            }   
         });
 
         function sendFormData(formData, form) {
@@ -300,44 +309,82 @@
             });
         }
 
-        // Event listener untuk tombol Delete di form
         document.addEventListener('click', function (e) {
-            const deleteBtn = e.target.closest('.delete-btn');
-            if (deleteBtn) {
-                e.preventDefault();
-                const form = deleteBtn.closest('form');
-                const dataId = form.querySelector('input[name^="data_pendukung"][name$="[id_data_pendukung]"]').value;
-                const url = "{{ route('kriteria.deleteData', ['id' => $kriteria->id_kriteria, 'dataId' => ':dataId']) }}".replace(':dataId', dataId);
+        // Event listener untuk hapus gambar
+        const removeImageBtn = e.target.closest('.remove-image');
+        if (removeImageBtn) {
+            e.preventDefault();
+            const gambarId = removeImageBtn.dataset.id;
 
-                Swal.fire({
-                    title: 'Apakah Anda yakin?',
-                    text: 'Data akan dihapus secara permanen!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#e74c3c',
-                    cancelButtonColor: '#3498db',
-                    confirmButtonText: 'Ya, Hapus!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: url,
-                            method: 'POST',
-                            data: {
-                                _token: '{{ csrf_token() }}',
-                                id_data_pendukung: dataId
-                            },
-                            success: function (response) {
-                                Swal.fire('Sukses!', 'Data berhasil dihapus.', 'success');
-                                form.remove();
-                                location.reload(); // Reload halaman untuk memperbarui daftar
-                            },
-                            error: function (xhr) {
-                                Swal.fire('Error!', 'Gagal menghapus data.', 'error');
-                            }
-                        });
-                    }
-                });
-            }
+            const url = "{{ route('kriteria.deleteGambar', ['id' => $kriteria->id_kriteria, 'gambarId' => ':gambarId']) }}".replace(':gambarId', gambarId);
+
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: 'Yakin menghapus gambar ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e74c3c',
+                cancelButtonColor: '#3498db',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        method: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function (response) {
+                            Swal.fire('Sukses!', 'Gambar berhasil dihapus.', 'success');
+                            removeImageBtn.closest('div').remove();
+                        },
+                        error: function (xhr) {
+                            Swal.fire('Error!', 'Gagal menghapus gambar. ' + xhr.responseText, 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        // Event listener untuk hapus data
+        const deleteDataBtn = e.target.closest('.delete-btn');
+        if (deleteDataBtn) {
+            e.preventDefault();
+            const form = deleteDataBtn.closest('form');
+            const dataId = form.querySelector('input[name^="data_pendukung"][name$="[id_data_pendukung]"]').value;
+            const url = "{{ route('kriteria.deleteData', ['id' => $kriteria->id_kriteria, 'dataId' => ':dataId']) }}".replace(':dataId', dataId);
+
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: 'Yakin menghapus data pendukung ini (termasuk semua gambar)?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e74c3c',
+                cancelButtonColor: '#3498db',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        method: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            id_data_pendukung: dataId
+                        },
+                        success: function (response) {
+                            Swal.fire('Sukses!', 'Data pendukung berhasil dihapus.', 'success');
+                            form.remove();
+                            location.reload(); // Reload untuk memperbarui daftar
+                        },
+                        error: function (xhr) {
+                            Swal.fire('Error!', 'Gagal menghapus data. ' + xhr.responseText, 'error');
+                        }
+                    });
+                }
+            });
+        }
         });
 
         // Event listener untuk tombol Cancel
@@ -371,7 +418,7 @@
 
             <!-- Form tambah data pendukung (tersembunyi) -->
             @if ($kriteria->status_selesai != 'Submitted')
-                <form id="add-form-{{ $index }}" class="data-pendukung-form add-form" data-category="{{ $index }}">
+                <form id="add-form-{{ $index }}" class="data-pendukung-form-add add-form" data-category="{{ $index }}">
                     <div class="form-row">
                         <div class="form-group">
                             <label>Nama Data Pendukung</label>
@@ -412,37 +459,49 @@
                                 <button class="btn btn-warning edit-data-btn" data-category="{{ $index }}" data-index="{{ $dataIndex }}">Edit</button>
                             @endif
                         </div>
-                        <!-- Form edit data pendukung (tersembunyi) -->
-                        @if ($kriteria->status_selesai != 'Submitted')
-                            <form id="edit-form-{{ $index }}-{{ $dataIndex }}" class="data-pendukung-form edit-form edit-form-{{ $index }}" data-category="{{ $index }}">
-                                <input type="hidden" name="data_pendukung[{{ $index }}][{{ $dataIndex }}][id_data_pendukung]" value="{{ $dataPendukung->id_data_pendukung }}">
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Nama Data Pendukung</label>
-                                        <textarea class="form-control" name="data_pendukung[{{ $index }}][{{ $dataIndex }}][nama_data]" rows="2">{{ $dataPendukung->nama_data }}</textarea>
-                                        <input type="hidden" name="data_pendukung[{{ $index }}][{{ $dataIndex }}][id_detail_kriteria]" value="{{ $detail->id_detail_kriteria }}">
-                                        <input type="hidden" name="data_pendukung[{{ $index }}][{{ $dataIndex }}][index]" value="{{ $dataIndex }}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Deskripsi Data Pendukung</label>
-                                        <textarea class="form-control ckeditor" name="data_pendukung[{{ $index }}][{{ $dataIndex }}][deskripsi_data]">{{ $dataPendukung->deskripsi_data }}</textarea>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>URL Data Pendukung</label>
-                                        <textarea class="form-control" name="data_pendukung[{{ $index }}][{{ $dataIndex }}][hyperlink_data]" rows="2">{{ $dataPendukung->hyperlink_data }}</textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Upload Data</label>
-                                        <div class="dropzone"></div>
-                                    </div>
-                                </div>
-                                <div class="action-buttons">
-                                    <button type="button" class="btn btn-primary save-btn">Save</button>
-                                    <button type="button" class="btn btn-success cancel-btn">Cancel</button>
-                                    <button type="button" class="btn btn-danger delete-btn">Delete</button>
-                                </div>
+
+            <!-- Form edit data pendukung (tersembunyi) -->
+            @if ($kriteria->status_selesai != 'Submitted')
+                <form id="edit-form-{{ $index }}-{{ $dataIndex }}" class="data-pendukung-form edit-form edit-form-{{ $index }}" data-category="{{ $index }}">
+                <input type="hidden" name="data_pendukung[{{ $index }}][{{ $dataIndex }}][id_data_pendukung]" value="{{ $dataPendukung->id_data_pendukung }}">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Nama Data Pendukung</label>
+                <textarea class="form-control" name="data_pendukung[{{ $index }}][{{ $dataIndex }}][nama_data]" rows="2">{{ $dataPendukung->nama_data }}</textarea>
+                <input type="hidden" name="data_pendukung[{{ $index }}][{{ $dataIndex }}][id_detail_kriteria]" value="{{ $detail->id_detail_kriteria }}">
+                <input type="hidden" name="data_pendukung[{{ $index }}][{{ $dataIndex }}][index]" value="{{ $dataIndex }}">
+            </div>
+            <div class="form-group">
+                <label>Deskripsi Data Pendukung</label>
+                <textarea class="form-control ckeditor" name="data_pendukung[{{ $index }}][{{ $dataIndex }}][deskripsi_data]">{{ $dataPendukung->deskripsi_data }}</textarea>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>URL Data Pendukung</label>
+                <textarea class="form-control" name="data_pendukung[{{ $index }}][{{ $dataIndex }}][hyperlink_data]" rows="2">{{ $dataPendukung->hyperlink_data }}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Upload Data</label>
+                <!-- Tampilkan gambar yang sudah ada -->
+                @if ($dataPendukung->gambar->count() > 0)
+                    <div class="existing-images" style="margin-bottom: 10px;">
+                        @foreach ($dataPendukung->gambar as $gambar)
+                            <div style="display: inline-block; position: relative; margin-right: 10px;">
+                                <img src="{{ asset('storage/' . $gambar->gambar) }}" alt="Gambar" style="max-width: 100px; max-height: 100px; border: 1px solid #ddd; border-radius: 5px;">
+                                <a href="#" class="remove-image" data-id="{{ $gambar->id_gambar }}" style="position: absolute; top: 0; right: 0; color: red; font-weight: bold; text-decoration: none; background: #fff; border-radius: 50%; padding: 0 5px;">X</a>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+                <div class="dropzone" id="dropzone-{{ $index }}-{{ $dataIndex }}"></div>
+            </div>
+        </div>
+        <div class="action-buttons">
+            <button type="button" class="btn btn-primary save-btn">Save</button>
+            <button type="button" class="btn btn-success cancel-btn">Cancel</button>
+            <button type="button" class="btn btn-danger delete-btn">Delete</button>
+        </div>
                             </form>
                         @endif
                     @endforeach
