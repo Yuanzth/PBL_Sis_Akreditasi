@@ -16,7 +16,6 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/home', [WelcomeController::class, 'index'])->name('home');
     Route::get('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/login', [AuthController::class, 'postlogin']);
-    
 });
 
 // Rute untuk pengguna yang sudah login
@@ -29,13 +28,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/validasitahapsatu/list', [ValidasiTahapSatuController::class, 'list']);
 });
 
-    // Rute untuk Admin Kriteria (pengerjaan kriteria)
-    Route::prefix('kriteria')->group(function () {
-        Route::get('{id}', [KriteriaController::class, 'edit'])->name('kriteria.edit');
-        Route::post('{id}/save', [KriteriaController::class, 'save'])->name('kriteria.save');
-        Route::post('{id}/submit', [KriteriaController::class, 'submit'])->name('kriteria.submit');
-        Route::delete('{id}/data/{dataId}', [KriteriaController::class, 'deleteData'])->name('kriteria.deleteData');
-    });
+
+// Rute untuk Admin Kriteria (pengerjaan kriteria)
+Route::prefix('kriteria')->group(function () {
+    Route::get('{id}', [KriteriaController::class, 'edit'])->name('kriteria.edit');
+    Route::post('{id}/save', [KriteriaController::class, 'save'])->name('kriteria.save');
+    Route::post('{id}/submit', [KriteriaController::class, 'submit'])->name('kriteria.submit');
+    Route::delete('{id}/data/{dataId}', [KriteriaController::class, 'deleteData'])->name('kriteria.deleteData');
+    Route::delete('{id}/delete-gambar/{gambarId}', [KriteriaController::class, 'deleteGambar'])->name('kriteria.deleteGambar');
+});
 
 // Rute untuk KJM
 Route::middleware(['auth'])->group(function () {
@@ -51,7 +52,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/validasi-data', [ValidasiDirController::class, 'index']);
     Route::get('/validasi-data/{id}/lihat', [ValidasiDirController::class, 'show']);
     Route::put('/validasi-data/{id}/update', [ValidasiDirController::class, 'updateStatus']);
-        Route::get('/finalisasi-dokumen', [FinalDocumentController::class, 'index'])->name('finalisasi.index');
+    Route::get('/finalisasi-dokumen', [FinalDocumentController::class, 'index'])->name('finalisasi.index');
     Route::get('/finalisasi', [FinalDocumentController::class, 'index'])->name('finalisasi.index');
     Route::get('/finalisasi/export-pdf', [FinalDocumentController::class, 'exportPdf'])->name('finalisasi.export.pdf');
 });
