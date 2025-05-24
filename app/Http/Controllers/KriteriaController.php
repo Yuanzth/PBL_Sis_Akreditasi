@@ -7,10 +7,12 @@ use App\Models\DetailKriteriaModel;
 use App\Models\DataPendukungModel;
 use App\Models\GambarModel;
 use App\Models\KomentarModel;
+use App\Models\GeneratedDocumentModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\PDF;
 
 class KriteriaController extends Controller
 {
@@ -123,6 +125,7 @@ class KriteriaController extends Controller
 
         return redirect()->route('kriteria.edit', $id)->with('success', 'Data berhasil disimpan ' . ($request->has('final_save') ? 'secara final' : 'sebagai draft'));
     }
+
     /**
      * Submit kriteria (ubah status ke Submitted).
      */
@@ -140,6 +143,7 @@ class KriteriaController extends Controller
 
         // Validasi input
         $request->validate([
+            'data_pendukung' => 'nullable|array',
             'data_pendukung.*.*.id_detail_kriteria' => 'required|exists:m_detail_kriteria,id_detail_kriteria',
             'data_pendukung.*.*.nama_data' => 'required|string|max:255',
             'data_pendukung.*.*.deskripsi_data' => 'nullable|string',
@@ -147,34 +151,36 @@ class KriteriaController extends Controller
             'data_pendukung.*.*.gambar.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        // Proses data pendukung
-        foreach ($request->data_pendukung as $categoryIndex => $dataList) {
-            foreach ($dataList as $dataIndex => $data) {
-                $dataPendukung = DataPendukungModel::updateOrCreate(
-                    [
-                        'id_detail_kriteria' => $data['id_detail_kriteria'],
-                        'nama_data' => $data['nama_data']
-                    ],
-                    [
-                        'deskripsi_data' => $data['deskripsi_data'] ?? '',
-                        'hyperlink_data' => $data['hyperlink_data'] ?? ''
-                    ]
-                );
+        // Proses data pendukung hanya jika ada
+        if ($request->has('data_pendukung')) {
+            foreach ($request->data_pendukung as $categoryIndex => $dataList) {
+                foreach ($dataList as $dataIndex => $data) {
+                    $dataPendukung = DataPendukungModel::updateOrCreate(
+                        [
+                            'id_detail_kriteria' => $data['id_detail_kriteria'],
+                            'nama_data' => $data['nama_data']
+                        ],
+                        [
+                            'deskripsi_data' => $data['deskripsi_data'] ?? '',
+                            'hyperlink_data' => $data['hyperlink_data'] ?? ''
+                        ]
+                    );
 
-                // Proses upload gambar
-                if ($request->hasFile("data_pendukung.{$categoryIndex}.{$dataIndex}.gambar")) {
-                    Log::info('Files received for processing', ['files' => $request->file("data_pendukung.{$categoryIndex}.{$dataIndex}.gambar")]);
-                    foreach ($request->file("data_pendukung.{$categoryIndex}.{$dataIndex}.gambar") as $file) {
-                        $path = $file->store('gambar/draft', 'public');
-                        GambarModel::create([
-                            'id_data_pendukung' => $dataPendukung->id_data_pendukung,
-                            'gambar' => $path,
-                            'draft' => true
-                        ]);
-                        Log::info('Gambar disimpan', ['path' => $path, 'id_data_pendukung' => $dataPendukung->id_data_pendukung]);
+                    // Proses upload gambar
+                    if ($request->hasFile("data_pendukung.{$categoryIndex}.{$dataIndex}.gambar")) {
+                        Log::info('Files received for processing', ['files' => $request->file("data_pendukung.{$categoryIndex}.{$dataIndex}.gambar")]);
+                        foreach ($request->file("data_pendukung.{$categoryIndex}.{$dataIndex}.gambar") as $file) {
+                            $path = $file->store('gambar/draft', 'public');
+                            GambarModel::create([
+                                'id_data_pendukung' => $dataPendukung->id_data_pendukung,
+                                'gambar' => $path,
+                                'draft' => true
+                            ]);
+                            Log::info('Gambar disimpan', ['path' => $path, 'id_data_pendukung' => $dataPendukung->id_data_pendukung]);
+                        }
+                    } else {
+                        Log::warning('No files received for processing', ['categoryIndex' => $categoryIndex, 'dataIndex' => $dataIndex]);
                     }
-                } else {
-                    Log::warning('No files received for processing', ['categoryIndex' => $categoryIndex, 'dataIndex' => $dataIndex]);
                 }
             }
         }
@@ -185,9 +191,35 @@ class KriteriaController extends Controller
             'tanggal_submit' => now()
         ]);
 
+        // Ambil data dari database untuk generate PDF
+        $detailKriteria = DetailKriteriaModel::with(['kategori', 'dataPendukung.gambar'])
+            ->where('id_kriteria', $id)
+            ->get();
+
+        // Generate PDF
+        $html = view('pdf.kriteria', compact('kriteria', 'detailKriteria'))->render();
+        $pdf = PDF::loadHTML($html);
+        $pdfPath = 'public/pdf/kriteria_' . $id . '_' . time() . '.pdf'; // Ubah ke public/pdf/
+        $pdfContent = $pdf->output();
+
+        if (!Storage::put($pdfPath, $pdfContent)) {
+            Log::error('Gagal menyimpan PDF untuk id_kriteria: ' . $id, ['path' => $pdfPath]);
+            return redirect()->route('dashboard')->with('error', 'Gagal menghasilkan PDF');
+        }
+
+        $fullPath = Storage::url(str_replace('public/', '', $pdfPath)); // Hapus 'public/' dari path untuk asset
+
+        // Simpan path ke t_generated_document
+        GeneratedDocumentModel::create([
+            'id_kriteria' => $id,
+            'generated_document' => str_replace('public/', '', $pdfPath), // Simpan tanpa 'public/'
+        ]);
+
+        Log::info('PDF generated and saved for id_kriteria: ' . $id, ['user_id' => Auth::user()->id_user, 'path' => $pdfPath]);
+
         Log::info('Kriteria disubmit untuk id_kriteria: ' . $id, ['user_id' => Auth::user()->id_user]);
 
-        return redirect()->route('dashboard')->with('success', 'Kriteria berhasil disubmit');
+        return redirect()->route('dashboard')->with('success', 'Kriteria berhasil disubmit dan PDF telah dihasilkan');
     }
 
     /**
@@ -237,3 +269,4 @@ class KriteriaController extends Controller
         return response()->json(['message' => 'Gambar berhasil dihapus']);
     }
 }
+?>

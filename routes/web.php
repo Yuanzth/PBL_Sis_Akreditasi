@@ -24,8 +24,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/profile', [UserController::class, 'profile']);
     Route::post('/updatephoto', [UserController::class, 'updatePhoto']);
-    Route::get('/validasitahapsatu', [ValidasiTahapSatuController::class, 'index']);  // menampilkan halaman awal user
-    Route::post('/validasitahapsatu/list', [ValidasiTahapSatuController::class, 'list']);
+    Route::get('/validasitahapsatu', [ValidasiTahapSatuController::class, 'index'])->name('validasi.tahap.satu'); // Halaman utama
+    Route::post('/validasitahapsatu/list', [ValidasiTahapSatuController::class, 'list'])->name('validasi.tahap.satu.list'); // DataTables list
 });
 
 

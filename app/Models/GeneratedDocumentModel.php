@@ -10,8 +10,14 @@ class GeneratedDocumentModel extends Model
     protected $primaryKey = 'id_generated_document';
     public $timestamps = false;
 
+    protected $fillable = [
+        'id_kriteria',
+        'generated_document',
+    ];
+
     public function kriteria()
     {
-        return $this->belongsTo(KriteriaModel::class, 'id_kriteria');
+        return $this->belongsTo(KriteriaModel::class, 'id_kriteria', 'id_kriteria');
     }
 }
+?>

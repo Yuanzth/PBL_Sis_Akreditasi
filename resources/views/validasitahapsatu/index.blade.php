@@ -12,7 +12,7 @@
         @if (session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
-        <!-- Filter and Search Section -->
+        <!-- Filter Section -->
         <div class="row mb-3">
             <div class="col-md-3">
                 <label for="filter_status">Status Validasi</label>
@@ -23,10 +23,6 @@
                     <option value="On Progress">On Progress</option>
                 </select>
             </div>
-            <div class="col-md-3">
-                <label for="search_global">Pencarian</label>
-                <input type="text" id="search_global" class="form-control" placeholder="Cari...">
-            </div>
         </div>
         <table class="table table-bordered table-striped table-hover table-sm" id="table_validasi">
             <thead>
@@ -34,6 +30,7 @@
                     <th>No</th>
                     <th>Nama Kriteria</th>
                     <th>Tanggal Submit</th>
+                    <th>Status Selesai</th>
                     <th>Status Validasi</th>
                     <th>Divalidasi Oleh</th>
                     <th>Aksi</th>
@@ -71,9 +68,12 @@
         background-color: #0056b3;
     }
 </style>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
 @endpush
 
 @push('js')
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 <script>
     function modalAction(url = '') {
         if (url) {
@@ -88,7 +88,7 @@
     }
 
     function approveAction(url) {
-        if (confirm('Apakah Anda yakin ingin menyetujui data ini?')) {
+        if (confirm('Apakah Anda yakin ingin memvalidasi data ini?')) {
             $.post(url, {_token: '{{ csrf_token() }}'}, function(data) {
                 if (data.status) {
                     $('#table_validasi').DataTable().ajax.reload();
@@ -113,80 +113,82 @@
         }
     }
 
-    function notesAction(url) {
-        modalAction(url);
-    }
-
     $(document).ready(function() {
         var dataValidasi = $('#table_validasi').DataTable({
             serverSide: true,
             ajax: {
-                "url": "{{ url('validasi-tahap-satu/list') }}",
+                "url": "{{ route('validasi.tahap.satu.list') }}",
                 "dataType": "json",
                 "type": "POST",
                 "data": function(d) {
-                    d.nama_kriteria = $('#filter_kriteria').val();
+                    d._token = '{{ csrf_token() }}';
                     d.status_validasi = $('#filter_status').val();
-                    d.divalidasi_oleh = $('#filter_user').val();
-                    d.search_global = $('#search_global').val();
                 }
             },
-            columns: [{
-                // No (Row Index)
-                data: "DT_RowIndex",
-                className: "text-center",
-                orderable: false,
-                searchable: false
-            }, {
-                // Nama Kriteria (from m_kriteria)
-                data: "nama_kriteria",
-                className: "",
-                orderable: true,
-                searchable: true,
-                render: function(data, type, row) {
-                    return data ? data : '-';
-                }
-            }, {
-                // Tanggal Submit (from t_validasi)
-                data: "tanggal_submit",
-                className: "",
-                orderable: true,
-                searchable: true,
-                render: function(data, type, row) {
-                    return data ? data : '-';
-                }
-            }, {
-                // Status Validasi (from t_validasi)
-                data: "status_validasi",
-                className: "",
-                orderable: true,
-                searchable: true,
-                render: function(data, type, row) {
-                    if (data === 'Valid') {
-                        return '<span class="status-valid">' + data + '</span>';
-                    } else if (data === 'Ditolak') {
-                        return '<span class="status-rejected">' + data + '</span>';
-                    } else if (data === 'On Progress') {
-                        return '<span class="status-onprogress">' + data + '</span>';
+            columns: [
+                {
+                    data: null,
+                    className: "text-center",
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
                     }
-                    return '-';
+                },
+                {
+                    data: "nama_kriteria",
+                    className: "",
+                    orderable: true,
+                    searchable: true,
+                    render: function(data, type, row) {
+                        return data ? data : '-';
+                    }
+                },
+                {
+                    data: "tanggal_submit",
+                    className: "",
+                    orderable: true,
+                    searchable: true,
+                    render: function(data, type, row) {
+                        return data ? data : '-';
+                    }
+                },
+                {
+                    data: "status_selesai",
+                    className: "",
+                    orderable: true,
+                    searchable: true
+                },
+                {
+                    data: "status_validasi",
+                    className: "",
+                    orderable: true,
+                    searchable: true
+                },
+                {
+                    data: "divalidasi_oleh",
+                    className: "",
+                    orderable: true,
+                    searchable: true,
+                    render: function(data, type, row) {
+                        return data ? data : '-';
+                    }
+                },
+                {
+                    data: "aksi",
+                    className: "text-center",
+                    orderable: false,
+                    searchable: false
                 }
-            }, {
-                // Divalidasi Oleh (from m_user via id_user in t_validasi)
-                data: "divalidasi_oleh",
-                className: "",
-                orderable: true,
-                searchable: true,
-                render: function(data, type, row) {
-                    return data ? data : '-';
+            ],
+            columnDefs: [
+                {
+                    targets: [3, 4, 6],
+                    render: function(data, type, row) {
+                        return type === 'display' ? data : data.replace(/<[^>]+>/g, '');
+                    }
                 }
-            }, {
-                // Aksi
-                data: "aksi",
-                className: "text-center",
-                orderable: false,
-                searchable: false
-            }],
+            ],
             language: {
                 emptyTable: "Tidak ada data yang tersedia di tabel",
                 info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
@@ -204,12 +206,7 @@
             }
         });
 
-        // Handle filter and search events
-        $('#filter_kriteria, #filter_status, #filter_user').on('change', function() {
-            dataValidasi.ajax.reload();
-        });
-
-        $('#search_global').on('keyup', function() {
+        $('#filter_status').on('change', function() {
             dataValidasi.ajax.reload();
         });
     });

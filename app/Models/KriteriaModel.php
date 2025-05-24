@@ -6,6 +6,7 @@ class KriteriaModel extends Model
 {
     protected $table = 'm_kriteria';
     protected $primaryKey = 'id_kriteria';
+    protected $fillable = ['id_kriteria', 'id_user', 'nama_kriteria', 'status_selesai', 'created_at', 'updated_at'];
     public $timestamps = true;
 
     public function user()
