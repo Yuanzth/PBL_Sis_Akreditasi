@@ -39,8 +39,6 @@
         </table>
     </div>
 </div>
-<div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
-    data-keyboard="false" data-width="75%" aria-hidden="true"></div>
 @endsection
 
 @push('css')
@@ -69,50 +67,17 @@
     }
 </style>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 @endpush
 
 @push('js')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
 <script>
-    function modalAction(url = '') {
-        if (url) {
-            $('#myModal').load(url, function() {
-                $('#myModal').modal('show');
-            });
-        }
-    }
-
-    function showDetail(url) {
-        modalAction(url);
-    }
-
-    function approveAction(url) {
-        if (confirm('Apakah Anda yakin ingin memvalidasi data ini?')) {
-            $.post(url, {_token: '{{ csrf_token() }}'}, function(data) {
-                if (data.status) {
-                    $('#table_validasi').DataTable().ajax.reload();
-                    alert(data.message);
-                } else {
-                    alert(data.message);
-                }
-            });
-        }
-    }
-
-    function rejectAction(url) {
-        if (confirm('Apakah Anda yakin ingin menolak data ini?')) {
-            $.post(url, {_token: '{{ csrf_token() }}'}, function(data) {
-                if (data.status) {
-                    $('#table_validasi').DataTable().ajax.reload();
-                    alert(data.message);
-                } else {
-                    alert(data.message);
-                }
-            });
-        }
-    }
-
     $(document).ready(function() {
         var dataValidasi = $('#table_validasi').DataTable({
             serverSide: true,
@@ -210,5 +175,15 @@
             dataValidasi.ajax.reload();
         });
     });
+
+    function showNotSubmittedAlert() {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Peringatan',
+            text: 'Kriteria ini belum selesai dikerjakan oleh Admin Kriteria',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#3085d6'
+        });
+    }
 </script>
 @endpush

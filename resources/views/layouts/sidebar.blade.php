@@ -128,15 +128,15 @@
                             Validasi
                         </li>
                         <li class="nav-item" style="margin: 5px 0;">
-                            <a href="{{ url('/validasi-data') }}"
-                                class="nav-link {{ ($activeMenu == 'validasi-data') ? 'active' : '' }}"
+                            <a href="{{ url('/validasi-tahap-dua') }}"
+                                class="nav-link {{ ($activeMenu == 'validasi-tahap-dua') ? 'active' : '' }}"
                                 style="color: #FFFFFF; padding: 10px 15px; display: flex; align-items: center; 
-                                                  background-color: {{ ($activeMenu == 'validasi-data') ? '#2196F3' : 'transparentmint' }};"
+                                                  background-color: {{ ($activeMenu == 'validasi-tahap-dua') ? '#2196F3' : 'transparent' }};"
                                 onmouseover="this.style.backgroundColor='#4CAF50'; this.style.color='#FFFFFF';"
-                                onmouseout="this.style.backgroundColor='{{ ($activeMenu == 'validasi-data') ? '#2196F3' : 'transparent' }}'; this.style.color='#FFFFFF';">
+                                onmouseout="this.style.backgroundColor='{{ ($activeMenu == 'validasi-tahap-dua') ? '#2196F3' : 'transparent' }}'; this.style.color='#FFFFFF';">
                                 <img src="{{ asset('dashboard/icons/icon_validasi_data.png') }}" class="nav-icon"
                                     style="width: 18px; height: 18px; margin-right: 8px;">
-                                <p style="color: #FFFFFF; margin: 0;">Validasi Data</p>
+                                <p style="color: #FFFFFF; margin: 0;">Validasi</p>
                             </a>
                         </li>
                         <li class="nav-header"

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\KriteriaModel;
 use App\Models\ValidasiModel;
+use App\Models\GeneratedDocumentModel;
 use App\Models\UserModel;
+use App\Models\KomentarModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Log;
@@ -29,10 +31,21 @@ class ValidasiTahapSatuController extends Controller
     {
         try {
             $query = KriteriaModel::select('m_kriteria.*')
-                ->with(['validasi' => function ($query) {
-                    $query->orderBy('updated_at', 'desc')->first();
-                }, 'validasi.user'])
+                ->with([
+                    'validasi' => function ($query) {
+                        $query->orderBy('updated_at', 'desc')->first();
+                    },
+                    'validasi.user'
+                ])
                 ->whereIn('id_kriteria', range(1, 9));
+
+            $statusFilter = $request->input('status_validasi');
+
+            if ($statusFilter) {
+                $query->whereHas('validasi', function ($query) use ($statusFilter) {
+                    $query->where('status', $statusFilter);
+                })->orWhereDoesntHave('validasi');
+            }
 
             return DataTables::eloquent($query)
                 ->addColumn('nama_kriteria', fn($row) => 'Kriteria ' . $row->id_kriteria)
@@ -61,18 +74,14 @@ class ValidasiTahapSatuController extends Controller
                         : '<span class="status-onprogress">On Progress</span>';
                 })
                 ->addColumn('aksi', function ($row) {
-                    $status = $row->validasi->first()->status ?? 'On Progress';
-                    $buttons = '<div class="text-center">' .
-                        '<button onclick="showDetail(\'' . url('/validasitahapsatu/' . $row->id_kriteria . '/show_ajax') . '\')" class="btn btn-sm btn-info mr-1">Lihat</button>';
-
-                    if ($row->status_selesai === 'Submitted' && $status !== 'Sudah Tugas Tim') {
-                        $buttons .= '<button onclick="approveAction(\'' . url('/validasitahapsatu/' . $row->id_kriteria . '/approve_ajax') . '\')" class="btn btn-sm btn-success mr-1">Diterima</button>' .
-                                    '<button onclick="rejectAction(\'' . url('/validasitahapsatu/' . $row->id_kriteria . '/reject_ajax') . '\')" class="btn btn-sm btn-danger mr-1">Ditolak</button>';
+                    $button = '<div class="text-center">';
+                    if ($row->status_selesai === 'Submitted') {
+                        $button .= '<a href="' . route('validasi.tahap.satu.show', $row->id_kriteria) . '" class="btn btn-sm btn-info mr-1">Lihat</a>';
+                    } else {
+                        $button .= '<button onclick="showNotSubmittedAlert()" class="btn btn-sm btn-info mr-1">Lihat</button>';
                     }
-
-                    $buttons .= '</div>';
-
-                    return $buttons;
+                    $button .= '</div>';
+                    return $button;
                 })
                 ->rawColumns(['status_submit', 'status_validasi', 'status_selesai', 'aksi'])
                 ->toJson();
@@ -82,70 +91,104 @@ class ValidasiTahapSatuController extends Controller
         }
     }
 
-    public function show_ajax($id)
+    public function show($id)
     {
-        $kriteria = KriteriaModel::with(['validasi' => function ($query) {
-            $query->orderBy('updated_at', 'desc')->first();
-        }, 'user'])->findOrFail($id);
-        $latestValidation = $kriteria->validasi->first();
-        $googleDriveLink = $latestValidation ? $latestValidation->google_drive_link : null; // Ganti dengan kolom yang sesuai jika ada
-        return view('validasitahapsatu.show_ajax', compact('kriteria', 'googleDriveLink'));
+        try {
+            $kriteria = KriteriaModel::with([
+                'validasi' => function ($query) {
+                    $query->orderBy('updated_at', 'desc')->first();
+                },
+                'user'
+            ])->findOrFail($id);
+
+            $generatedDocument = GeneratedDocumentModel::where('id_kriteria', $id)->first();
+            $pdfPath = $generatedDocument ? asset('storage/' . $generatedDocument->generated_document) : null;
+
+            $activeMenu = 'validasitahapsatu';
+            $breadcrumb = (object) [
+                'title' => 'Detail Validasi',
+                'list' => ['Home', 'Validasi Data', 'Detail Validasi']
+            ];
+
+            return view('validasitahapsatu.show', compact('kriteria', 'pdfPath', 'activeMenu', 'breadcrumb'));
+        } catch (\Exception $e) {
+            Log::error('Error in ValidasiTahapSatuController@show: ' . $e->getMessage(), [
+                'id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            abort(500, 'Terjadi kesalahan internal');
+        }
     }
 
-    public function approve_ajax(Request $request, $id)
+    public function approve(Request $request, $id)
     {
         try {
             $kriteria = KriteriaModel::findOrFail($id);
-            $comment = $request->input('comment', ''); // Ambil komentar dari request
+            $comment = $request->input('comment', '');
+
+            // Simpan validasi ke t_validasi
             $validasi = ValidasiModel::create([
                 'id_kriteria' => $id,
                 'id_user' => auth()->id(),
                 'status' => 'Sudah Tugas Tim',
-                'comment' => $comment,
+                'created_at' => now()->setTimezone('Asia/Jakarta'),
                 'updated_at' => now()->setTimezone('Asia/Jakarta'),
             ]);
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Validasi berhasil diterima'
-            ]);
+            // Simpan komentar ke t_komentar jika ada
+            if (!empty($comment)) {
+                KomentarModel::create([
+                    'id_kriteria' => $id,
+                    'id_user' => auth()->id(),
+                    'komentar' => $comment,
+                    'created_at' => now()->setTimezone('Asia/Jakarta'),
+                    'updated_at' => now()->setTimezone('Asia/Jakarta'),
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Validasi berhasil diterima');
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Gagal menerima validasi: ' . $e->getMessage()
-            ], 500);
+            return redirect()->back()->with('error', 'Gagal menerima validasi: ' . $e->getMessage());
         }
     }
 
-    public function reject_ajax(Request $request, $id)
+    public function reject(Request $request, $id)
     {
         try {
             $kriteria = KriteriaModel::findOrFail($id);
-            $comment = $request->input('comment', ''); // Ambil komentar dari request
+            $comment = $request->input('comment', '');
+
+            // Simpan validasi ke t_validasi
             $validasi = ValidasiModel::create([
                 'id_kriteria' => $id,
                 'id_user' => auth()->id(),
                 'status' => 'Belum Validasi',
-                'comment' => $comment,
+                'created_at' => now()->setTimezone('Asia/Jakarta'),
                 'updated_at' => now()->setTimezone('Asia/Jakarta'),
             ]);
+
+            // Simpan komentar ke t_komentar jika ada
+            if (!empty($comment)) {
+                KomentarModel::create([
+                    'id_kriteria' => $id,
+                    'id_user' => auth()->id(),
+                    'komentar' => $comment,
+                    'created_at' => now()->setTimezone('Asia/Jakarta'),
+                    'updated_at' => now()->setTimezone('Asia/Jakarta'),
+                ]);
+            }
+
+            // Update status_selesai di m_kriteria menjadi 'Save'
             $kriteria->update(['status_selesai' => 'Save']);
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Validasi berhasil ditolak'
-            ]);
+            return redirect()->back()->with('success', 'Validasi berhasil ditolak');
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Gagal menolak validasi: ' . $e->getMessage()
-            ], 500);
+            return redirect()->back()->with('error', 'Gagal menolak validasi: ' . $e->getMessage());
         }
     }
 
     public function notes_ajax(Request $request, $id)
     {
-        // Tombol Catatan dinonaktifkan, fungsi ini tidak digunakan lagi
         return response()->json(['status' => false, 'message' => 'Fungsi tidak tersedia']);
     }
 }
