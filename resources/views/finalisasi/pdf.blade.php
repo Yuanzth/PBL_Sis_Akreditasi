@@ -33,14 +33,16 @@
         <tr>
             <!-- Logo Kiri (Polinema) -->
             <td width="15%" class="text-center">
-                <img src="{{ public_path('polinema-bw.png') }}" style="width:80px;">
+                <img src="{{ public_path('public/polinema-bw.png') }}" style="width:80px;">
             </td>
 
             <!-- Teks Header -->
             <td width="70%">
-                <div class="text-center font-12"><strong>KEMENTERIAN PENDIDIKAN, KEBUDAYAAN, RISET, DAN TEKNOLOGI</strong></div>
+                <div class="text-center font-12"><strong>KEMENTERIAN PENDIDIKAN TINGGI, SAINS, DAN TEKNOLOGI</strong></div>
                 <div class="text-center font-12"><strong>POLITEKNIK NEGERI MALANG</strong></div>
-                <div class="text-center" style="font-size: 10pt;">Jl. Soekarno-Hatta No. 9 Malang 65141</div>
+                <div class="text-center" style="font-size: 10pt;">Jalan Soekarno Hatta Nomor 9 Jatimulyo, Lowokwaru, Malang 65141</div>
+                <div class="text-center" style="font-size: 10pt;">Telepon (0341) 404424, 404425, Faksimile (0341) 404420</div>
+                <div class="text-center" style="font-size: 10pt;">Laman www.polinema.ac.id</div>
             </td>
 
             <!-- Logo Kanan (JTI) -->
