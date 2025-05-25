@@ -27,12 +27,12 @@
 
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar elevation-4"
-            style="min-height: 100vh; display: flex; flex-direction: column; background-color: #a7e6aa;">
+            style="min-height: 100vh; display: flex; flex-direction: column; background-color: #D9D9D9;">
             <!-- Brand Logo -->
             <a href="{{ url('/') }}" class="brand-link">
-                <img src="{{ asset('landing_page/logo/logo_jti.png') }}" alt="JTI Logo"
-                    class="brand-image img-circle elevation-2">
-                <span class="brand-text font-weight-light" style="color: rgb(0, 0, 0);">Sistem Akreditasi SIB</span>
+                <img src="{{ asset('landing_page/logo/logo_jti.png') }}" alt="JTI Logo" height="40" width="40">
+                    
+                <span class="brand-text font-weight-light" style="color: rgb(0, 0, 0);"><b>Sistem Akreditasi SIB</b></span>
             </a>
 
             <!-- Sidebar -->
@@ -78,4 +78,3 @@
 </body>
 
 </html>
-?>

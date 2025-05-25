@@ -1,5 +1,5 @@
 <div class="sidebar d-flex flex-column justify-content-between"
-    style="height: 100vh; background-color: #2E7D32; color: white; padding: 15px; overflow-x: hidden;">
+    style="height: 100vh; background-color: #0B6B4F; color: white; padding: 15px; overflow-x: hidden;">
     <!-- SidebarSearch Form -->
     <div class="form-inline mt-2">
         {{-- <div class="input-group" data-widget="sidebar-search">
