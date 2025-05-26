@@ -94,6 +94,24 @@
 </style>
 @endpush
 
+@push('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            @if (session('success'))
+                Swal.fire({
+                    title: 'Sukses!',
+                    text: '{{ session('success') }}',
+                    icon: 'success',
+                    confirmButtonColor: '#2ecc71',
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            @endif
+        });
+    </script>
+@endpush
+
 @section('content')
 <div class="container-fluid">
     <!-- Welcome Message -->

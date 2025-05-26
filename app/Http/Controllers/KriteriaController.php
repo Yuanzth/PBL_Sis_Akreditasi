@@ -199,56 +199,43 @@ class KriteriaController extends Controller
         // Generate PDF
         $html = view('pdf.kriteria', compact('kriteria', 'detailKriteria'))->render();
         $pdf = PDF::loadHTML($html);
-        $pdfPath = 'public/pdf/kriteria_' . $id . '_' . time() . '.pdf'; // Ubah ke public/pdf/
-        $pdfContent = $pdf->output();
+        $timestamp = time();
+        $fileName = "kriteria_{$id}_{$timestamp}.pdf";
+        $pdfPath = 'pdf/' . $fileName; // Path relatif untuk storage/app/public/pdf/
 
-        if (!Storage::put($pdfPath, $pdfContent)) {
+        // Cek dan hapus semua dokumen lama untuk id_kriteria ini
+        $existingDocuments = GeneratedDocumentModel::where('id_kriteria', $id)->get();
+        foreach ($existingDocuments as $existingDocument) {
+            $oldFilePath = $existingDocument->generated_document; // Path relatif seperti 'pdf/kriteria_1_1748190421.pdf'
+            if (Storage::disk('public')->exists($oldFilePath)) {
+                if (!Storage::disk('public')->delete($oldFilePath)) {
+                    Log::error('Gagal menghapus file lama untuk id_kriteria: ' . $id, ['path' => $oldFilePath]);
+                } else {
+                    Log::info('File lama berhasil dihapus untuk id_kriteria: ' . $id, ['path' => $oldFilePath]);
+                }
+            }
+            $existingDocument->delete();
+        }
+
+        // Simpan file PDF baru ke penyimpanan
+        $pdfContent = $pdf->output();
+        if (!Storage::disk('public')->put($pdfPath, $pdfContent)) {
             Log::error('Gagal menyimpan PDF untuk id_kriteria: ' . $id, ['path' => $pdfPath]);
             return redirect()->route('dashboard')->with('error', 'Gagal menghasilkan PDF');
         }
 
-        $fullPath = Storage::url(str_replace('public/', '', $pdfPath)); // Hapus 'public/' dari path untuk asset
-
         // Simpan path ke t_generated_document
         GeneratedDocumentModel::create([
             'id_kriteria' => $id,
-            'generated_document' => str_replace('public/', '', $pdfPath), // Simpan tanpa 'public/'
+            'generated_document' => $pdfPath, // Simpan path relatif
         ]);
 
         Log::info('PDF generated and saved for id_kriteria: ' . $id, ['user_id' => Auth::user()->id_user, 'path' => $pdfPath]);
 
         Log::info('Kriteria disubmit untuk id_kriteria: ' . $id, ['user_id' => Auth::user()->id_user]);
 
+        // Redirect dengan pesan sukses
         return redirect()->route('dashboard')->with('success', 'Kriteria berhasil disubmit dan PDF telah dihasilkan');
-    }
-
-    /**
-     * Menghapus data pendukung.
-     */
-    public function deleteData(Request $request, $id, $dataId)
-    {
-        $request->validate([
-            'id_data_pendukung' => 'required|exists:t_data_pendukung,id_data_pendukung'
-        ]);
-
-        $dataPendukung = DataPendukungModel::findOrFail($request->id_data_pendukung);
-        $kriteria = KriteriaModel::where('id_kriteria', $id)
-            ->where('id_user', Auth::user()->id_user)
-            ->firstOrFail();
-
-        // Hapus gambar terkait
-        $gambar = GambarModel::where('id_data_pendukung', $dataPendukung->id_data_pendukung)->get();
-        foreach ($gambar as $img) {
-            Storage::disk('public')->delete($img->gambar);
-            $img->delete();
-        }
-
-        // Hapus data pendukung
-        $dataPendukung->delete();
-
-        Log::info('Data pendukung dihapus untuk id_kriteria: ' . $id, ['user_id' => Auth::user()->id_user, 'id_data_pendukung' => $request->id_data_pendukung]);
-
-        return response()->json(['message' => 'Data berhasil dihapus']);
     }
 
     /**

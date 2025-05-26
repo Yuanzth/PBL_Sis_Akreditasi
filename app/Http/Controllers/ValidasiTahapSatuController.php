@@ -33,7 +33,8 @@ class ValidasiTahapSatuController extends Controller
             $query = KriteriaModel::select('m_kriteria.*')
                 ->with([
                     'validasi' => function ($query) {
-                        $query->orderBy('updated_at', 'desc')->first();
+                        $query->whereIn('id_user', [10, 11]) // Hanya ambil validasi dari KPS/Kajur (tahap satu)
+                            ->orderBy('updated_at', 'desc');
                     },
                     'validasi.user'
                 ])
@@ -56,7 +57,10 @@ class ValidasiTahapSatuController extends Controller
                         : '<span class="status-onprogress">On Progress</span>';
                 })
                 ->addColumn('status_validasi', function ($row) {
-                    $status = $row->validasi->first()->status ?? null;
+                    // Ambil entri validasi pertama (tahap satu) dari koleksi
+                    $validasi = $row->validasi->first();
+                    $status = $validasi ? $validasi->status : ($row->status_selesai === 'Submitted' ? 'On Progress' : 'On Progress');
+
                     if ($status === 'Sudah Tugas Tim') {
                         return '<span class="status-valid">Valid</span>';
                     } elseif ($status === 'Belum Validasi') {
@@ -66,7 +70,9 @@ class ValidasiTahapSatuController extends Controller
                     }
                 })
                 ->addColumn('divalidasi_oleh', function ($row) {
-                    return $row->validasi->first() && $row->validasi->first()->user ? $row->validasi->first()->user->name : '-';
+                    // Ambil entri validasi pertama untuk mendapatkan user
+                    $validasi = $row->validasi->first();
+                    return $validasi && $validasi->user ? $validasi->user->name : '-';
                 })
                 ->addColumn('status_selesai', function ($row) {
                     return $row->status_selesai === 'Submitted'
@@ -90,7 +96,6 @@ class ValidasiTahapSatuController extends Controller
             return response()->json(['error' => 'Terjadi kesalahan pada server'], 500);
         }
     }
-
     public function show($id)
     {
         try {
@@ -126,14 +131,27 @@ class ValidasiTahapSatuController extends Controller
             $kriteria = KriteriaModel::findOrFail($id);
             $comment = $request->input('comment', '');
 
-            // Simpan validasi ke t_validasi
-            $validasi = ValidasiModel::create([
-                'id_kriteria' => $id,
-                'id_user' => auth()->id(),
-                'status' => 'Sudah Tugas Tim',
-                'created_at' => now()->setTimezone('Asia/Jakarta'),
-                'updated_at' => now()->setTimezone('Asia/Jakarta'),
-            ]);
+            // Ambil atau buat entri validasi untuk tahap satu
+            $validasi = ValidasiModel::where('id_kriteria', $id)->whereIn('id_user', [10, 11]) // Kajur atau KPS
+                ->orderBy('updated_at', 'desc')
+                ->first();
+
+            if ($validasi) {
+                // Update entri lama jika sudah ada
+                $validasi->update([
+                    'status' => 'Sudah Tugas Tim',
+                    'updated_at' => now()->setTimezone('Asia/Jakarta'),
+                ]);
+            } else {
+                // Buat entri baru jika belum ada
+                $validasi = ValidasiModel::create([
+                    'id_kriteria' => $id,
+                    'id_user' => auth()->id(),
+                    'status' => 'Sudah Tugas Tim',
+                    'created_at' => now()->setTimezone('Asia/Jakarta'),
+                    'updated_at' => now()->setTimezone('Asia/Jakarta'),
+                ]);
+            }
 
             // Simpan komentar ke t_komentar jika ada
             if (!empty($comment)) {
@@ -148,6 +166,10 @@ class ValidasiTahapSatuController extends Controller
 
             return redirect()->back()->with('success', 'Validasi berhasil diterima');
         } catch (\Exception $e) {
+            Log::error('Error in ValidasiTahapSatuController@approve: ' . $e->getMessage(), [
+                'id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
             return redirect()->back()->with('error', 'Gagal menerima validasi: ' . $e->getMessage());
         }
     }
@@ -158,14 +180,30 @@ class ValidasiTahapSatuController extends Controller
             $kriteria = KriteriaModel::findOrFail($id);
             $comment = $request->input('comment', '');
 
-            // Simpan validasi ke t_validasi
-            $validasi = ValidasiModel::create([
-                'id_kriteria' => $id,
-                'id_user' => auth()->id(),
-                'status' => 'Belum Validasi',
-                'created_at' => now()->setTimezone('Asia/Jakarta'),
-                'updated_at' => now()->setTimezone('Asia/Jakarta'),
-            ]);
+            // Ambil atau buat entri validasi untuk tahap satu
+            $validasi = ValidasiModel::where('id_kriteria', $id)->whereIn('id_user', [10, 11]) // Kajur atau KPS
+                ->orderBy('updated_at', 'desc')
+                ->first();
+
+            if ($validasi) {
+                // Update entri lama jika sudah ada
+                $validasi->update([
+                    'status' => 'Belum Validasi',
+                    'updated_at' => now()->setTimezone('Asia/Jakarta'),
+                ]);
+            } else {
+                // Buat entri baru jika belum ada (harusnya jarang terjadi)
+                $validasi = ValidasiModel::create([
+                    'id_kriteria' => $id,
+                    'id_user' => auth()->id(),
+                    'status' => 'Belum Validasi',
+                    'created_at' => now()->setTimezone('Asia/Jakarta'),
+                    'updated_at' => now()->setTimezone('Asia/Jakarta'),
+                ]);
+            }
+
+            // Update status_selesai di m_kriteria menjadi 'Save' saat ditolak
+            $kriteria->update(['status_selesai' => 'Save']);
 
             // Simpan komentar ke t_komentar jika ada
             if (!empty($comment)) {
@@ -178,11 +216,12 @@ class ValidasiTahapSatuController extends Controller
                 ]);
             }
 
-            // Update status_selesai di m_kriteria menjadi 'Save'
-            $kriteria->update(['status_selesai' => 'Save']);
-
             return redirect()->back()->with('success', 'Validasi berhasil ditolak');
         } catch (\Exception $e) {
+            Log::error('Error in ValidasiTahapSatuController@reject: ' . $e->getMessage(), [
+                'id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
             return redirect()->back()->with('error', 'Gagal menolak validasi: ' . $e->getMessage());
         }
     }
@@ -192,4 +231,3 @@ class ValidasiTahapSatuController extends Controller
         return response()->json(['status' => false, 'message' => 'Fungsi tidak tersedia']);
     }
 }
-?>

@@ -153,7 +153,7 @@
         // Render halaman tertentu
         function renderPage(pageNum) {
             pdfDoc.getPage(pageNum).then(page => {
-                const scale = 1.5;
+                const scale = 0.8;
                 const viewport = page.getViewport({ scale });
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
