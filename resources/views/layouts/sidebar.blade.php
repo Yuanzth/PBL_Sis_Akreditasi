@@ -128,7 +128,7 @@
                             Validasi
                         </li>
                         <li class="nav-item" style="margin: 5px 0;">
-                            <a href="{{ url('/validasi-tahap-dua') }}"
+                            <a href="{{ url('/validasitahapdua') }}"
                                 class="nav-link {{ ($activeMenu == 'validasi-tahap-dua') ? 'active' : '' }}"
                                 style="color: #FFFFFF; padding: 10px 15px; display: flex; align-items: center; 
                                                   background-color: {{ ($activeMenu == 'validasi-tahap-dua') ? '#2196F3' : 'transparent' }};"
@@ -136,7 +136,7 @@
                                 onmouseout="this.style.backgroundColor='{{ ($activeMenu == 'validasi-tahap-dua') ? '#2196F3' : 'transparent' }}'; this.style.color='#FFFFFF';">
                                 <img src="{{ asset('dashboard/icons/icon_validasi_data.png') }}" class="nav-icon"
                                     style="width: 18px; height: 18px; margin-right: 8px;">
-                                <p style="color: #FFFFFF; margin: 0;">Validasi</p>
+                                <p style="color: #FFFFFF; margin: 0;">Validasi Tahap Dua</p>
                             </a>
                         </li>
                         <li class="nav-header"

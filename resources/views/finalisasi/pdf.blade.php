@@ -1,69 +1,98 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <style>
-        body {
-            font-family: "Times New Roman", Times, serif;
-            margin: 6px 20px;
-            line-height: 1.5;
-        }
-        .text-center {
-            text-align: center;
-        }
-        .border-bottom-header {
-            border-bottom: 1px solid;
-        }
-        .font-12 {
-            font-size: 12pt;
-        }
-        .document-content {
-            margin-top: 20px;
-            white-space: pre-line;
-        }
-        .page-break {
-            page-break-after: always;
-        }
+        body { font-family: Arial, sans-serif; }
+        .border-bottom-header { border-bottom: 2px solid #000; margin-bottom: 20px; }
+        .text-center { text-align: center; }
+        .d-block { display: block; }
+        .font-11 { font-size: 11px; }
+        .font-13 { font-size: 13px; }
+        .font-10 { font-size: 10px; }
+        .font-bold { font-weight: bold; }
+        .image { max-width: 100px; max-height: 100px; }
+        .section { margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        img { max-width: 100px; max-height: 100px; }
     </style>
 </head>
 <body>
-
-    <!-- Header -->
-    <table class="border-bottom-header" style="width: 100%;">
+    <table class="border-bottom-header">
         <tr>
-            <!-- Logo Kiri (Polinema) -->
             <td width="15%" class="text-center">
-                <img src="{{ public_path('public/polinema-bw.png') }}" style="width:80px;">
+                <img src="{{ public_path('landing_page/logopoltek.png') }}" style="width:80px;">
             </td>
-
-            <!-- Teks Header -->
-            <td width="70%">
-                <div class="text-center font-12"><strong>KEMENTERIAN PENDIDIKAN TINGGI, SAINS, DAN TEKNOLOGI</strong></div>
-                <div class="text-center font-12"><strong>POLITEKNIK NEGERI MALANG</strong></div>
-                <div class="text-center" style="font-size: 10pt;">Jalan Soekarno Hatta Nomor 9 Jatimulyo, Lowokwaru, Malang 65141</div>
-                <div class="text-center" style="font-size: 10pt;">Telepon (0341) 404424, 404425, Faksimile (0341) 404420</div>
-                <div class="text-center" style="font-size: 10pt;">Laman www.polinema.ac.id</div>
-            </td>
-
-            <!-- Logo Kanan (JTI) -->
-            <td width="15%" class="text-center">
-                <img src="{{ public_path('logo_jti.png') }}" style="width:80px;">
+            <td width="85%">
+                <span class="text-center d-block font-11 font-bold mb-1">
+                    KEMENTERIAN PENDIDIKAN TINGGI, SAINS, DAN TEKNOLOGI
+                </span>
+                <span class="text-center d-block font-13 font-bold mb-1">
+                    POLITEKNIK NEGERI MALANG
+                </span>
+                <span class="text-center d-block font-10">
+                    Jl. Soekarno-Hatta No. 9 Malang 65141
+                </span>
+                <span class="text-center d-block font-10">
+                    Telepon (0341) 404424 Pes. 101-105, 0341-404420, Fax. (0341) 404420
+                </span>
+                <span class="text-center d-block font-10">
+                    Laman: www.polinema.ac.id
+                </span>
             </td>
         </tr>
     </table>
 
-    <h3 class="text-center">LAPORAN FINALISASI DOKUMEN</h3>
+    <h2 class="text-center">Dokumen Akreditasi Final</h2>
 
-    <!-- Hanya menampilkan isi dokumen -->
-    @foreach($documents as $doc)
-        <div class="document-content">
-            {!! nl2br(e($doc->final_document)) !!}
+    @foreach ($kriteriaList as $kriteria)
+        <div class="section">
+            <h3>Kriteria {{ $kriteria->id_kriteria }}</h3>
+            @forelse ($kriteria->detailKriteria as $detail)
+                <div class="section">
+                    <h4>{{ $detail->kategori->nama_kategori }} (Penetapan - Pengendalian)</h4>
+                    @if ($detail->dataPendukung->isEmpty())
+                        <p>Tidak ada data pendukung untuk kategori ini.</p>
+                    @else
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nama Data</th>
+                                    <th>Deskripsi</th>
+                                    <th>Hyperlink</th>
+                                    <th>Gambar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($detail->dataPendukung as $data)
+                                    <tr>
+                                        <td>{{ $data->nama_data }}</td>
+                                        <td>{{ $data->deskripsi_data ?? '-' }}</td>
+                                        <td>
+                                            @if ($data->hyperlink_data)
+                                                <a href="{{ $data->hyperlink_data }}">{{ $data->hyperlink_data }}</a>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @forelse ($data->gambar as $gambar)
+                                                <img src="{{ public_path('storage/' . $gambar->gambar) }}" class="image">
+                                            @empty
+                                                -
+                                            @endforelse
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @endif
+                </div>
+            @empty
+                <p>Tidak ada detail kriteria untuk Kriteria {{ $kriteria->id_kriteria }}.</p>
+            @endforelse
         </div>
-
-        @if (!$loop->last)
-            <div class="page-break"></div>
-        @endif
     @endforeach
-
 </body>
 </html>

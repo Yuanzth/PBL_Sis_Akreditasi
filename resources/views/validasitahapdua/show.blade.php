@@ -3,8 +3,8 @@
 @section('content')
 <div class="card card-outline card-primary">
     <div class="card-header">
-        <h3 class="card-title">Detail Validasi - {{ $kriteria->nama_kriteria ?? 'Kriteria ' . $kriteria->id_kriteria }}</h3>
-        <a href="{{ route('validasi.tahap.satu') }}" class="btn btn-secondary float-right">Kembali</a>
+        <h3 class="card-title">Detail Validasi Tahap Dua - {{ $kriteria->nama_kriteria ?? 'Kriteria ' . $kriteria->id_kriteria }}</h3>
+        <a href="{{ route('validasi.tahap.dua') }}" class="btn btn-secondary float-right">Kembali</a>
     </div>
     <div class="card-body">
         @if (session('success'))
@@ -13,6 +13,7 @@
         @if (session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
+
         <div class="row">
             <!-- Kolom Kiri: Informasi dan Tombol -->
             <div class="col-md-6">
@@ -25,23 +26,57 @@
                     <p>{{ $kriteria->status_selesai === 'Submitted' ? ($kriteria->updated_at ?? $kriteria->created_at)->format('d/m/Y H:i:s') : '-' }}</p>
                 </div>
                 <div class="form-group">
+                    <label>Riwayat Validasi:</label>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Tahap</th>
+                                <th>Validator</th>
+                                <th>Status</th>
+                                <th>Tanggal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($kriteria->validasi as $validasi)
+                            <tr>
+                                <td>{{ in_array($validasi->id_user, [10, 11]) ? 'Tahap 1 (KPS/Kajur)' : 'Tahap 2 (KJM/Direktur)' }}</td>
+                                <td>{{ $validasi->user ? $validasi->user->name : '-' }}</td>
+                                <td>{{ $validasi->status }}</td>
+                                <td>{{ $validasi->updated_at->format('d-m-Y H:i:s') }}</td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="text-center">Belum ada riwayat validasi.</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Form Approve/Reject -->
+                @php
+                    $validasiTahapSatu = $kriteria->validasi->whereIn('id_user', [10, 11])
+                        ->where('status', 'Valid')
+                        ->where('updated_at', '>=', $kriteria->updated_at)
+                        ->first();
+                    $validasiTahapDua = $kriteria->validasi->whereIn('id_user', [12, 13])
+                        ->where('updated_at', '>=', $kriteria->updated_at)
+                        ->first();
+                @endphp
+                @if ($validasiTahapSatu && !$validasiTahapDua && $kriteria->status_selesai === 'Submitted')
+                <div class="form-group">
                     <label>Komentar:</label>
                     <textarea class="form-control" name="comment" id="comment" rows="4" placeholder="Masukkan komentar..."></textarea>
                 </div>
                 <div class="form-group d-flex" id="action-buttons">
-                    @php
-                        $validasiTahapSatu = $kriteria->validasi->whereIn('id_user', [10, 11])
-                            ->where('updated_at', '>=', $kriteria->updated_at)
-                            ->first();
-                    @endphp
-                    @if($kriteria->status_selesai === 'Submitted' && !$validasiTahapSatu)
-                        <button type="button" class="btn btn-success mr-2" id="approve-btn">Validasi</button>
-                        <button type="button" class="btn btn-danger" id="reject-btn">Tolak</button>
-                    @else
-                        <p>Kriteria ini sudah divalidasi atau belum submitted.</p>
-                    @endif
+                    <button type="button" class="btn btn-success mr-2" id="approve-btn">Terima</button>
+                    <button type="button" class="btn btn-danger" id="reject-btn">Tolak</button>
                 </div>
+                @else
+                <p>Kriteria ini sudah divalidasi tahap dua atau belum siap untuk divalidasi.</p>
+                @endif
             </div>
+
             <!-- Kolom Kanan: PDF Viewer -->
             <div class="col-md-6">
                 @if($pdfPath)
@@ -223,9 +258,9 @@
         // SweetAlert untuk Validasi
         $('#approve-btn').on('click', function() {
             Swal.fire({
-                title: 'Konfirmasi Validasi',
-                text: 'Apakah Anda yakin ingin memvalidasi kriteria ini?',
-                icon: 'question',
+                title: 'Konfirmasi Validasi Tahap Dua',
+                text: 'Apakah Anda yakin ingin memvalidasi kriteria ini? Setelah divalidasi akhir, keputusan ini tidak dapat diubah lagi karena dokumen akan dimerge dengan kriteria lain untuk finalisasi.',
+                icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Ya, Validasi',
                 cancelButtonText: 'Batal'
@@ -233,7 +268,7 @@
                 if (result.isConfirmed) {
                     const comment = $('#comment').val();
                     $.ajax({
-                        url: '{{ route("validasi.tahap.satu.approve", $kriteria->id_kriteria) }}',
+                        url: '{{ route("validasi.tahap.dua.approve", $kriteria->id_kriteria) }}',
                         method: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',
@@ -242,11 +277,11 @@
                         success: function(response) {
                             Swal.fire({
                                 title: 'Berhasil!',
-                                text: 'Validasi tahap satu berhasil diterima.',
+                                text: 'Validasi tahap dua berhasil diterima.',
                                 icon: 'success',
                                 confirmButtonText: 'OK'
                             }).then(() => {
-                                $('#action-buttons').html('<p>Kriteria ini sudah divalidasi atau belum submitted.</p>');
+                                $('#action-buttons').html('<p>Kriteria ini sudah divalidasi tahap dua atau belum siap untuk divalidasi.</p>');
                                 $('#success-message').remove(); // Hapus notifikasi default
                             });
                         },
@@ -278,7 +313,7 @@
 
             Swal.fire({
                 title: 'Konfirmasi Penolakan',
-                text: 'Apakah Anda yakin ingin menolak kriteria ini?',
+                text: 'Apakah Anda yakin ingin menolak kriteria ini? Kriteria akan dikembalikan untuk revisi.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Ya, Tolak',
@@ -286,7 +321,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '{{ route("validasi.tahap.satu.reject", $kriteria->id_kriteria) }}',
+                        url: '{{ route("validasi.tahap.dua.reject", $kriteria->id_kriteria) }}',
                         method: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',
@@ -295,11 +330,11 @@
                         success: function(response) {
                             Swal.fire({
                                 title: 'Berhasil!',
-                                text: 'Validasi tahap satu berhasil ditolak.',
+                                text: 'Validasi tahap dua berhasil ditolak.',
                                 icon: 'success',
                                 confirmButtonText: 'OK'
                             }).then(() => {
-                                $('#action-buttons').html('<p>Kriteria ini sudah divalidasi atau belum submitted.</p>');
+                                $('#action-buttons').html('<p>Kriteria ini sudah divalidasi tahap dua atau belum siap untuk divalidasi.</p>');
                                 $('#success-message').remove(); // Hapus notifikasi default
                             });
                         },

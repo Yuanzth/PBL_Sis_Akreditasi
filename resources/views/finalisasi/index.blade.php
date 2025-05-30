@@ -1,81 +1,214 @@
 @extends('layouts.template')
 
-@section('title', 'Finalisasi Dokumen')
-
 @section('content')
-<div class="container-fluid">
-    <div class="card card-success card-outline">
-        <div class="card-body">
-            <form method="GET" action="{{ route('finalisasi.index') }}">
-                <div class="row mb-4 align-items-center justify-content-between">
-                    {{-- Kolom Filter Kriteria (rata kiri) --}}
-                    <div class="col-md-3">
-                        <label class="form-label">Filter :</label>
-                        <select name="kategori" class="form-control" onchange="this.form.submit()">
-                            <option value="">-- Semua --</option>
-                            @for ($i = 1; $i <= 9; $i++)
-                                <option value="Kriteria {{ $i }}" {{ request('kategori') == "Kriteria $i" ? 'selected' : '' }}>
-                                    Kriteria {{ $i }}
-                                </option>
-                            @endfor
-                        </select>
-                        <small class="text-muted">Filter berdasarkan kategori kriteria</small>
-                    </div>
-
-                    {{-- Kolom Search (rata kanan) --}}
-                    <div class="col-md-4 d-flex justify-content-end">
-                        <div class="input-group" style="width: 70%;">
-                            <span class="input-group-text bg-white border-end-0">
-                                <i class="fas fa-search text-muted"></i>
-                            </span>
-                            <input type="text" name="search" class="form-control border-start-0" placeholder="Search..." value="{{ request('search') }}">
-                        </div>
-                    </div>
-                </div>
-            </form>
-
-            <table class="table table-bordered table-hover table-striped">
-                <thead class="bg-success text-white text-center">
-                    <tr>
-                        <th>No</th>
-                        <th>Nama Kriteria</th>
-                        <th>Tanggal Validasi</th>
-                        <th>Status Validasi</th>
-                        <th>Divalidasi Oleh</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($documents as $index => $doc)
-                    <tr>
-                        <td class="text-center">{{ $index + 1 }}</td>
-                        <td>{{ $doc->validasi->kriteria->nama_kriteria ?? '-' }}</td>
-                        <td class="text-center">
-                            {{ \Carbon\Carbon::parse($doc->validasi->tanggal_validasi ?? now())->format('d-m-Y H:i:s') }}
-                        </td>
-                        <td class="text-center">
-                            @if(isset($doc->validasi->status_validasi) && strtolower($doc->validasi->status_validasi) == 'valid')
-                                <span class="badge bg-success">Berhasil Divalidasi</span>
-                            @else
-                                <span class="badge bg-danger">Belum Valid</span>
-                            @endif
-                        </td>
-                        <td class="text-center">{{ $doc->validasi->user->name ?? 'KPS/Kajur' }}</td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="5" class="text-center">Tidak ada data</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-
-            {{-- Tombol Export di kanan bawah --}}
-            <div class="d-flex justify-content-end mt-3">
-                <a href="{{ route('finalisasi.export.pdf', ['kategori' => request('kategori')]) }}" class="btn btn-primary">
-                    Ekspor Dokumen
-                </a>
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        <h3 class="card-title">Finalisasi Dokumen</h3>
+    </div>
+    <div class="card-body">
+        @if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        @if (session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
+        <!-- Filter Section -->
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label for="filter_status">Status Validasi</label>
+                <select id="filter_status" class="form-control">
+                    <option value="">Semua Status</option>
+                    <option value="Valid">Valid</option>
+                    <option value="Ditolak">Ditolak</option>
+                    <option value="Belum Divalidasi">Belum Divalidasi</option>
+                </select>
             </div>
+        </div>
+        <table class="table table-bordered table-striped table-hover table-sm" id="table_finalisasi">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Kriteria</th>
+                    <th>Tanggal Submit</th>
+                    <th>Status Selesai</th>
+                    <th>Status Validasi</th>
+                    <th>Tanggal Validasi</th>
+                    <th>Divalidasi Oleh</th>
+                </tr>
+            </thead>
+        </table>
+
+        <!-- Tombol Ekspor di luar tabel -->
+        <div class="d-flex justify-content-end mt-3">
+            <button id="export-btn" class="btn btn-primary">Ekspor Dokumen</button>
         </div>
     </div>
 </div>
 @endsection
+
+@push('css')
+<style>
+    .status-valid {
+        color: #28a745;
+        font-weight: bold;
+    }
+    .status-rejected {
+        color: #dc3545;
+        font-weight: bold;
+    }
+    .status-onprogress {
+        color: #fd7e14;
+        font-weight: bold;
+    }
+    .badge-exclamation {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 15px;
+        height: 15px;
+        background-color: #ff4444; /* Warna merah untuk badge */
+        border-radius: 50%; /* Membuat bentuk lingkaran */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        color: #fff;
+        animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+</style>
+@endpush
+
+@push('js')
+<script>
+    $(document).ready(function() {
+        var dataFinalisasi = $('#table_finalisasi').DataTable({
+            serverSide: true,
+            ajax: {
+                "url": "{{ route('finalisasi.list') }}",
+                "dataType": "json",
+                "type": "POST",
+                "data": function(d) {
+                    d._token = '{{ csrf_token() }}';
+                    d.status_validasi = $('#filter_status').val();
+                }
+            },
+            columns: [
+                {
+                    data: null,
+                    className: "text-center",
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                },
+                {
+                    data: "nama_kriteria",
+                    className: "",
+                    orderable: true,
+                    searchable: true,
+                    render: function(data, type, row) {
+                        return data ? data : '-';
+                    }
+                },
+                {
+                    data: "tanggal_submit",
+                    className: "",
+                    orderable: true,
+                    searchable: true,
+                    render: function(data, type, row) {
+                        return data ? data : '-';
+                    }
+                },
+                {
+                    data: "status_selesai",
+                    className: "",
+                    orderable: true,
+                    searchable: true
+                },
+                {
+                    data: "status_validasi",
+                    className: "",
+                    orderable: true,
+                    searchable: true
+                },
+                {
+                    data: "tanggal_validasi",
+                    className: "",
+                    orderable: true,
+                    searchable: true
+                },
+                {
+                    data: "divalidasi_oleh",
+                    className: "",
+                    orderable: true,
+                    searchable: true,
+                    render: function(data, type, row) {
+                        return data ? data : '-';
+                    }
+                }
+            ],
+            columnDefs: [
+                {
+                    targets: [3, 4],
+                    render: function(data, type, row) {
+                        return type === 'display' ? data : data.replace(/<[^>]+>/g, '');
+                    }
+                }
+            ],
+            language: {
+                emptyTable: "Tidak ada data yang tersedia di tabel",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                infoEmpty: "Menampilkan 0 sampai 0 dari 0 entri",
+                loadingRecords: "Memuat...",
+                processing: "Sedang memproses...",
+                search: "Cari:",
+                zeroRecords: "Tidak ada data yang ditemukan",
+                paginate: {
+                    first: "Pertama",
+                    last: "Terakhir",
+                    next: "Selanjutnya",
+                    previous: "Sebelumnya"
+                }
+            }
+        });
+
+        $('#filter_status').on('change', function() {
+            dataFinalisasi.ajax.reload();
+        });
+
+        // Aksi tombol Ekspor
+        $('#export-btn').on('click', function() {
+            $.ajax({
+                url: '{{ route("finalisasi.export") }}',
+                method: 'GET',
+                success: function(response) {
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: 'Dokumen berhasil diekspor.',
+                        icon: 'success',
+                        confirmButtonText: 'Download'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = response.download_url;
+                        }
+                    });
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: xhr.responseJSON.error || 'Terjadi kesalahan saat mengekspor dokumen.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        });
+    });
+</script>
+@endpush

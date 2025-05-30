@@ -21,7 +21,7 @@ class KriteriaModel extends Model
 
     public function validasi()
     {
-        return $this->hasMany(ValidasiModel::class, 'id_kriteria');
+        return $this->hasMany(ValidasiModel::class, 'id_kriteria', 'id_kriteria');
     }
 
     public function komentar()

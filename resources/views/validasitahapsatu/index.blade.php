@@ -32,7 +32,7 @@
                     <th>Tanggal Submit</th>
                     <th>Status Selesai</th>
                     <th>Status Validasi</th>
-                    <th>Divalidasi Oleh</th>
+                    <th>Divalidasi/Ditolak Oleh</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -55,15 +55,44 @@
         color: #fd7e14;
         font-weight: bold;
     }
-    .btn-detail {
-        padding: 5px 10px;
-        background-color: #007bff;
-        color: #fff;
-        text-decoration: none;
-        border-radius: 3px;
+    .btn-active {
+        background-color: #007bff !important;
+        color: #fff !important;
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.5); /* Efek menyala */
+        transition: all 0.3s ease;
     }
-    .btn-detail:hover {
-        background-color: #0056b3;
+    .btn-active:hover {
+        box-shadow: 0 0 15px rgba(0, 123, 255, 0.7);
+    }
+    .btn-disabled {
+        background-color: #6c757d !important;
+        color: #ccc !important;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+    .btn-validated {
+        background-color: #17a2b8 !important;
+        color: #fff !important;
+    }
+    .badge-exclamation {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 15px;
+        height: 15px;
+        background-color: #ff4444; /* Warna merah untuk badge */
+        border-radius: 50%; /* Membuat bentuk lingkaran */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        color: #fff;
+        animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
     }
 </style>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">

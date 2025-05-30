@@ -8,6 +8,7 @@ use App\Models\DataPendukungModel;
 use App\Models\GambarModel;
 use App\Models\KomentarModel;
 use App\Models\GeneratedDocumentModel;
+use App\Models\ValidasiModel; // Tambahkan model ValidasiModel
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -185,10 +186,22 @@ class KriteriaController extends Controller
             }
         }
 
+        // Hapus semua entri validasi terkait di t_validasi sebelum submit
+        try {
+            ValidasiModel::where('id_kriteria', $id)->delete();
+            Log::info('Entri validasi dihapus untuk id_kriteria: ' . $id, ['user_id' => Auth::user()->id_user]);
+        } catch (\Exception $e) {
+            Log::error('Gagal menghapus entri validasi untuk id_kriteria: ' . $id, [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::user()->id_user
+            ]);
+            return redirect()->route('dashboard')->with('error', 'Gagal menghapus entri validasi lama: ' . $e->getMessage());
+        }
+
         // Update status kriteria
         $kriteria->update([
             'status_selesai' => 'Submitted',
-            'tanggal_submit' => now()
+            'tanggal_submit' => now()->setTimezone('Asia/Jakarta')
         ]);
 
         // Ambil data dari database untuk generate PDF
@@ -256,4 +269,3 @@ class KriteriaController extends Controller
         return response()->json(['message' => 'Gambar berhasil dihapus']);
     }
 }
-?>
