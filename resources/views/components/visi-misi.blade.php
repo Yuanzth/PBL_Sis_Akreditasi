@@ -1,7 +1,7 @@
 <!-- Link to external CSS -->
 <link rel="stylesheet" href="{{ asset('landing-custom.css') }}">
 
-<div class="section section-visi-misi" style="height: 85vh; background: url('{{ asset('landing_page/background/landing_page_visi_misi.png') }}') no-repeat top center; background-size: cover; margin-top: 0; padding-top: 0;">
+<div class="section section-visi-misi" style="height: 125vh; background: url('{{ asset('landing_page/background/landing_page_visi_misi.png') }}') no-repeat top center; background-size: cover; margin-top: 0; padding-top: 0;">
     <div class="container" style="padding-top: 50px;">
         <h2 class="text-center mb-4" style="color: #0B6B4F; font-weight: bold;">Visi & Misi Prodi Sistem Informasi Bisnis</h2>
         <p class="text-justify mb-5" style="font-size: 1rem; color: #333;">

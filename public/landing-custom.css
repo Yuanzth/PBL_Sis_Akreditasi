@@ -80,3 +80,64 @@
     background-size: cover;
     margin-top: 0;
 }
+
+/* section-tujuan */
+.equal-height {
+    display: flex;
+    flex-direction: column;
+}
+
+.tujuan-card {
+    background-color: rgba(119, 208, 130, 0.2);
+    border-left: 5px solid #007BFF;
+    width: 100%;
+    height: 400px;
+    overflow-y: auto;
+}
+
+.tujuan-box {
+    height: 400px;
+    width: 100%;
+}
+
+.object-fit-cover {
+    object-fit: cover;
+}
+
+/* section-sasaran */
+.sasaran-box {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sasaran-item {
+    display: flex;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    align-items: center;
+}
+
+.sasaran-icon {
+    background-color: #0B6B4F;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+}
+
+.sasaran-icon img {
+    width: 30px;
+    height: 30px;
+    filter: brightness(0) invert(1); /* Biar icon putih */
+}
+
+.sasaran-text {
+    padding: 20px;
+    font-size: 0.95rem;
+    color: #333;
+}
+
