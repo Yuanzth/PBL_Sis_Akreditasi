@@ -30,6 +30,7 @@
     }
     .welcome-section {
         margin-bottom: 20px;
+        background: #f2f2f2;
     }
     .welcome-section h1 {
         color: #333;
