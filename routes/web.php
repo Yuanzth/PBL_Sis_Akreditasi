@@ -50,8 +50,9 @@ Route::prefix('kriteria')->group(function () {
 
 Route::prefix('finalisasi-dokumen')->middleware(['auth'])->group(function () {
     Route::get('/', [App\Http\Controllers\FinalisasiController::class, 'index'])->name('finalisasi.index');
-    Route::post('/list', [App\Http\Controllers\FinalisasiController::class, 'list'])->name('finalisasi.list'); // Ubah ke POST
+    Route::post('/list', [App\Http\Controllers\FinalisasiController::class, 'list'])->name('finalisasi.list');
     Route::get('/export', [App\Http\Controllers\FinalisasiController::class, 'export'])->name('finalisasi.export');
+    Route::get('/show/{id}', [App\Http\Controllers\FinalisasiController::class, 'showFinal'])->name('finalisasi.showFinal');
 });
 // // Rute untuk KJM
 // Route::middleware(['auth'])->group(function () {

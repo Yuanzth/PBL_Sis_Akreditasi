@@ -10,13 +10,10 @@ class FinalDocumentModel extends Model
     protected $primaryKey = 'id_final_document';
     public $timestamps = false;
 
+    protected $fillable = ['id_user', 'final_document'];
+
     public function user()
     {
-        return $this->belongsTo(User::class, 'id_user');
-    }
-
-    public function validasi()
-    {
-        return $this->belongsTo(ValidasiModel::class, 'id_validasi');
+        return $this->belongsTo(UserModel::class, 'id_user', 'id_user'); // Ubah ke UserModel dan tentukan primary key
     }
 }

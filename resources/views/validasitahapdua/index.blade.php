@@ -48,6 +48,10 @@
         color: #28a745;
         font-weight: bold;
     }
+    .status-onkjm {
+        color: #7559e4;
+        font-weight: bold;
+    }
     .status-rejected {
         color: #dc3545;
         font-weight: bold;

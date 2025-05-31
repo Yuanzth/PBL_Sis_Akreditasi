@@ -16,6 +16,26 @@
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #f2f2f2; }
         img { max-width: 100px; max-height: 100px; }
+        .page-break { page-break-before: always; }
+        ul { list-style-type: none; padding-left: 20px; }
+        ul li::before { content: "- "; }
+        ul li { margin-bottom: 5px; } /* Jarak antar data pendukung */
+        .deskripsi {
+            font-size: 14px; /* Ukuran font konsisten */
+            line-height: 1.5; /* Jarak baris yang nyaman */
+            padding: 2px 0; /* Padding vertikal kecil */
+            margin: 0; /* Hilangkan margin bawaan */
+            display: block; /* Pastikan elemen block */
+        }
+        /* Aturan tambahan untuk konsistensi HTML */
+        .deskripsi p {
+            margin: 0; /* Hilangkan margin bawaan dari <p> */
+            padding: 0;
+        }
+        .deskripsi a {
+            color: #0000FF; /* Warna link biru standar */
+            text-decoration: underline; /* Garis bawah pada link */
+        }
     </style>
 </head>
 <body>
@@ -44,50 +64,33 @@
         </tr>
     </table>
 
-    <h2 class="text-center">Dokumen Akreditasi Final</h2>
+    <h2 class="text-center">LAPORAN FINALISASI DOKUMEN AKREDITASI</h2>
+    <p class="text-center font-10">Tanggal: {{ now()->format('d-m-Y H:i:s') }}</p>
 
-    @foreach ($kriteriaList as $kriteria)
-        <div class="section">
-            <h3>Kriteria {{ $kriteria->id_kriteria }}</h3>
-            @forelse ($kriteria->detailKriteria as $detail)
+    @foreach ($kriteriaList as $index => $kriteria)
+        <div class="section {{ $index > 0 ? 'page-break' : '' }}">
+            <h3 class="text-center">LAPORAN DATA KRITERIA {{ $kriteria->id_kriteria }}</h3>
+            @forelse ($kriteria->detailKriteria as $detailIndex => $detail)
                 <div class="section">
-                    <h4>{{ $detail->kategori->nama_kategori }} (Penetapan - Pengendalian)</h4>
-                    @if ($detail->dataPendukung->isEmpty())
-                        <p>Tidak ada data pendukung untuk kategori ini.</p>
-                    @else
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nama Data</th>
-                                    <th>Deskripsi</th>
-                                    <th>Hyperlink</th>
-                                    <th>Gambar</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($detail->dataPendukung as $data)
-                                    <tr>
-                                        <td>{{ $data->nama_data }}</td>
-                                        <td>{{ $data->deskripsi_data ?? '-' }}</td>
-                                        <td>
-                                            @if ($data->hyperlink_data)
-                                                <a href="{{ $data->hyperlink_data }}">{{ $data->hyperlink_data }}</a>
-                                            @else
-                                                -
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @forelse ($data->gambar as $gambar)
-                                                <img src="{{ public_path('storage/' . $gambar->gambar) }}" class="image">
-                                            @empty
-                                                -
-                                            @endforelse
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    @endif
+                    <h4>{{ $detailIndex + 1 }}. {{ $detail->kategori->nama_kategori }}</h4>
+                    <ul>
+                        @forelse ($detail->dataPendukung as $data)
+                            <li>
+                                <strong>{{ $data->nama_data }}</strong><br>
+                                Deskripsi: <span class="deskripsi">{!! $data->deskripsi_data !!}</span><br>
+                                @if($data->gambar->isNotEmpty())
+                                    Gambar:
+                                    @foreach($data->gambar as $index => $gambar)
+                                        <img src="{{ public_path('storage/' . $gambar->gambar) }}" alt="Gambar {{ $index + 1 }}" class="image">
+                                    @endforeach
+                                @else
+                                    Gambar: -
+                                @endif
+                            </li>
+                        @empty
+                            <li>Tidak ada data pendukung untuk kategori ini.</li>
+                        @endforelse
+                    </ul>
                 </div>
             @empty
                 <p>Tidak ada detail kriteria untuk Kriteria {{ $kriteria->id_kriteria }}.</p>

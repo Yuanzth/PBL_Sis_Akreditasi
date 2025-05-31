@@ -6,11 +6,13 @@ use App\Models\KriteriaModel;
 use App\Models\DetailKriteriaModel;
 use App\Models\DataPendukungModel;
 use App\Models\ValidasiModel;
+use App\Models\FinalDocumentModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\PDF;
 use Illuminate\Support\Facades\Storage;
+use Auth;
 
 class FinalisasiController extends Controller
 {
@@ -22,9 +24,13 @@ class FinalisasiController extends Controller
             'list' => ['Home', 'Finalisasi Dokumen']
         ];
 
+        // Ambil dokumen final (hanya satu) dengan penanganan error
+        $finalDocument = FinalDocumentModel::with('user')->first();
+
         return view('finalisasi.index', [
             'activeMenu' => $activeMenu,
-            'breadcrumb' => $breadcrumb
+            'breadcrumb' => $breadcrumb,
+            'finalDocument' => $finalDocument
         ]);
     }
 
@@ -101,6 +107,13 @@ class FinalisasiController extends Controller
     public function export(Request $request)
     {
         try {
+            // Cek apakah sudah ada dokumen final
+            if (FinalDocumentModel::exists()) {
+                return response()->json([
+                    'error' => 'Dokumen final hanya dapat diekspor satu kali.'
+                ], 403);
+            }
+
             // Periksa apakah semua kriteria (1-9) sudah divalidasi tahap dua dengan status "Valid"
             $kriteria = KriteriaModel::select('m_kriteria.*')
                 ->with([
@@ -159,14 +172,39 @@ class FinalisasiController extends Controller
                 return response()->json(['error' => 'Gagal menyimpan PDF'], 500);
             }
 
-            Log::info('PDF finalisasi berhasil dibuat', ['path' => $pdfPath]);
+            // Simpan ke t_final_document
+            $finalDocument = new FinalDocumentModel();
+            $finalDocument->id_user = Auth::id();
+            $finalDocument->final_document = $pdfPath;
+            $finalDocument->save();
 
-            // Kembalikan URL untuk download
+            Log::info('PDF finalisasi berhasil dibuat dan disimpan', ['path' => $pdfPath, 'user_id' => Auth::id()]);
+
+            // Kembalikan URL untuk download dan ID dokumen
             $downloadUrl = asset('storage/' . $pdfPath);
-            return response()->json(['success' => 'Dokumen berhasil diekspor', 'download_url' => $downloadUrl]);
+            return response()->json([
+                'success' => 'Dokumen berhasil diekspor dan disimpan.',
+                'download_url' => $downloadUrl,
+                'document_id' => $finalDocument->id_final_document
+            ]);
         } catch (\Exception $e) {
             Log::error('Error in FinalisasiController@export: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['error' => 'Terjadi kesalahan saat mengekspor dokumen'], 500);
         }
+    }
+
+    public function showFinal($id)
+    {
+        $document = FinalDocumentModel::findOrFail($id);
+        $pdfUrl = asset('storage/' . $document->final_document);
+        $downloadUrl = asset('storage/' . $document->final_document);
+
+        $activeMenu = 'finalisasi-dokumen';
+        $breadcrumb = (object) [
+            'title' => 'Dokumen Final',
+            'list' => ['Home', 'Finalisasi Dokumen', 'Lihat Dokumen']
+        ];
+
+        return view('finalisasi.show', compact('pdfUrl', 'downloadUrl', 'activeMenu', 'breadcrumb'));
     }
 }

@@ -22,7 +22,7 @@
     <table class="border-bottom-header">
         <tr>
             <td width="15%" class="text-center">
-                <img src="{{ asset('landing_page/logopoltek.png') }}" style="width:80px;">
+                <img src="{{ public_path('landing_page/logopoltek.png') }}" style="width:80px;">
             </td>
             <td width="85%">
                 <span class="text-center d-block font-11 font-bold mb-1">

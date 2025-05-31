@@ -70,7 +70,7 @@ class ValidasiTahapDuaController extends Controller
                     }
 
                     if ($validasiTahapSatu->status === 'Valid' && !$validasiTahapDua) {
-                        return '<span class="status-valid">Menunggu Validasi KJM/Direktur</span>';
+                        return '<span class="status-onkjm">Menunggu Validasi KJM/Direktur</span>';
                     }
 
                     if ($validasiTahapDua) {

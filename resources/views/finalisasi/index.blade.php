@@ -7,11 +7,17 @@
     </div>
     <div class="card-body">
         @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+            <div class="alert alert-success">
+                {{ session('success') }}
+                @if (session('document_id'))
+                    <a href="{{ route('finalisasi.showFinal', session('document_id')) }}" class="btn btn-sm btn-info mt-2">Lihat Dokumen</a>
+                @endif
+            </div>
         @endif
         @if (session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
+            <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
+
         <!-- Filter Section -->
         <div class="row mb-3">
             <div class="col-md-3">
@@ -40,8 +46,24 @@
 
         <!-- Tombol Ekspor di luar tabel -->
         <div class="d-flex justify-content-end mt-3">
-            <button id="export-btn" class="btn btn-primary">Ekspor Dokumen</button>
+            <button id="export-btn" class="btn btn-primary" @if($finalDocument) disabled @endif>
+                Ekspor Dokumen
+            </button>
         </div>
+
+        <!-- Kotak Dokumen Final -->
+        @if ($finalDocument)
+            <div class="mt-4">
+                <h4>Dokumen Final</h4>
+                <div class="card">
+                    <div class="card-body">
+                        <p><strong>Nama File:</strong> {{ basename($finalDocument->final_document) }}</p>
+                        <p><strong>Diekspor Oleh:</strong> {{ $finalDocument->user ? $finalDocument->user->name : '-' }}</p>
+                        <a href="{{ route('finalisasi.showFinal', $finalDocument->id_final_document) }}" class="btn btn-info">Lihat Dokumen</a>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 </div>
 @endsection
@@ -184,27 +206,46 @@
 
         // Aksi tombol Ekspor
         $('#export-btn').on('click', function() {
-            $.ajax({
-                url: '{{ route("finalisasi.export") }}',
-                method: 'GET',
-                success: function(response) {
-                    Swal.fire({
-                        title: 'Berhasil!',
-                        text: 'Dokumen berhasil diekspor.',
-                        icon: 'success',
-                        confirmButtonText: 'Download'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = response.download_url;
+            Swal.fire({
+                title: 'Konfirmasi Ekspor',
+                text: 'Apakah Anda yakin ingin mengekspor dokumen final? Proses ini hanya dapat dilakukan satu kali.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Ekspor',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ route("finalisasi.export") }}',
+                        method: 'GET',
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    text: response.success,
+                                    icon: 'success',
+                                    showCancelButton: false,
+                                    confirmButtonText: 'OK!',
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = response.download_url; // Download dokumen
+                                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                        window.location.href = '{{ url("finalisasi-dokumen/show") }}/' + response.document_id; // Redirect ke halaman showFinal
+                                    }
+                                }).then(() => {
+                                    // Reload halaman setelah SweetAlert ditutup
+                                    location.reload();
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                title: 'Gagal!',
+                                text: xhr.responseJSON.error || 'Terjadi kesalahan saat mengekspor dokumen.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
                         }
-                    });
-                },
-                error: function(xhr) {
-                    Swal.fire({
-                        title: 'Gagal!',
-                        text: xhr.responseJSON.error || 'Terjadi kesalahan saat mengekspor dokumen.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
                     });
                 }
             });
