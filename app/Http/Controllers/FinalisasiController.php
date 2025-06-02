@@ -55,11 +55,11 @@ class FinalisasiController extends Controller
                         $query->whereIn('id_user', [12, 13])
                             ->where('status', $statusFilter === 'Valid' ? 'Valid' : 'Belum Validasi');
                     })
-                    ->orWhereDoesntHave('validasi', function ($query) use ($statusFilter) {
-                        if ($statusFilter === 'Belum Divalidasi') {
-                            $query->whereIn('id_user', [12, 13]);
-                        }
-                    });
+                        ->orWhereDoesntHave('validasi', function ($query) use ($statusFilter) {
+                            if ($statusFilter === 'Belum Divalidasi') {
+                                $query->whereIn('id_user', [12, 13]);
+                            }
+                        });
                 });
             }
 
@@ -106,6 +106,7 @@ class FinalisasiController extends Controller
 
     public function export(Request $request)
     {
+        set_time_limit(300);
         try {
             // Cek apakah sudah ada dokumen final
             if (FinalDocumentModel::exists()) {
