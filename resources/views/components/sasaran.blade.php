@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="{{ asset('landing-custom.css') }}">
 
 <!-- Section Sasaran -->
-<section class="section" style="padding: 60px 0; background-color: #F9F9F9;">
+<section id="sasaran" class="section" style="padding: 60px 0; background-color: #F9F9F9;">
     <div class="container">
         <h2 class="text-center mb-3" style="color: #0B6B4F; font-weight: bold;">Sasaran</h2>
         <p class="text-center mb-5" style="color: #333;">

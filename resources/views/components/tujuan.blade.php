@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="{{ asset('landing-custom.css') }}">
 
 <!-- Section Tujuan dengan Carousel (Rounded Square) -->
-<div class="section section-visi-misi" style="background: url('{{ asset('landing_page/background/landing_page_tujuan_prodi.png') }}') no-repeat top center; background-size: cover; margin-top: 0; padding-top: 0; padding-bottom: 50px;">
+<div id="tujuan" class="section section-visi-misi" style="background: url('{{ asset('landing_page/background/landing_page_tujuan_prodi.png') }}') no-repeat top center; background-size: cover; margin-top: 0; padding-top: 0; padding-bottom: 50px;">
     <div class="container pt-5">
         <h2 class="text-center mb-5" style="color: #0B6B4F; font-weight: bold;">Tujuan Prodi Sistem Informasi Bisnis</h2>
         <p class="text-justify mb-5" style="font-size: 1rem; color: #333;">
