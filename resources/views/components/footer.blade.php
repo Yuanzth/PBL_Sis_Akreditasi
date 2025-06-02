@@ -1,90 +1,173 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Sistem Akreditasi SIB</title>
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Footer SIB</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
 
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+    body {
+      background-color: #f8f8f8;
+    }
 
-        main {
-            flex: 1 0 auto;
-        }
+    footer.footer {
+      background-color: #ffffff;
+      padding: 50px 80px 0;
+    }
 
-        .footer {
-            flex-shrink: 0;
-            background-color: #ffffff; /* warna putih */
-            padding: 150px 0;
-            text-align: center;
-        }
+    .footer .container {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
 
-        .container {
-            width: 80%;
-            margin: 0 auto;
-        }
+    .footer-left {
+      max-width: 55%;
+    }
 
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-        }
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 15px;
+    }
 
-        .col-md-6 {
-            width: 48%;
-            text-align: left;
-        }
+    .logo-row img {
+      height: 60px;
+    }
 
-        .mt-3 {
-            margin-top: 1rem;
-        }
+    .address {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #333;
+    }
 
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
+    .telepon {
+      margin-top: 30px;
+      margin-bottom: 30px;
+    }
 
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    .telepon i {
+      margin-right: 8px;
+      color: #0B6B4F;
+    }
+
+    .footer-right {
+      text-align: right;
+    }
+
+    .footer-right h4 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #222;
+    }
+
+    .social-icons img {
+      width: 24px;
+      height: 24px;
+      margin-left: 14px;
+      vertical-align: middle;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .social-icons img:hover {
+      transform: scale(1.1);
+    }
+
+    .footer-bottom {
+      background-color: #0B6B4F;
+      color: white;
+      padding: 18px 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 14px;
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
+      box-sizing: border-box;
+    }
+
+    .footer-bottom .links a {
+      color: white;
+      text-decoration: none;
+      margin-left: 25px;
+    }
+
+    .footer-bottom .links a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .footer .container {
+        flex-direction: column;
+        gap: 30px;
+      }
+
+      .footer-right {
+        text-align: left;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+        padding: 18px 20px;
+      }
+
+      .footer-bottom .links a {
+        margin: 0 10px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <img src="{{ asset('landing_page/logo/Logo Polinema 4.png') }}" alt="Polinema Logo" style="width: 50px;" />
-                    <img src="{{ asset('landing_page/logo/logo_jti.png') }}" alt="JTI Logo" style="width: 50px;" />
-                    <p>
-                        Politeknik Negeri Malang<br />
-                        Jl. Soekarno Hatta No. 9, Jatimulyo, Kec. Lowokwaru,<br />
-                        Kota Malang, Jawa Timur 65141<br />
-                        © (0341) 404424
-                    </p>
-                </div>
-                <div class="col-md-6">
-                    <p>
-                        Social Media:<br />
-                        <img src="{{ asset('landing_page/icons/icon_facebook.png') }}" alt="Facebook" style="width: 24px; margin-right: 10px;" />
-                        <img src="{{ asset('landing_page/icons/icon_gmail.png') }}" alt="Gmail" style="width: 24px; margin-right: 10px;" />
-                        <img src="{{ asset('landing_page/icons/icon_instagram.png') }}" alt="Instagram" style="width: 24px;" />
-                    </p>
-                </div>
-            </div>
-            <p class="mt-3">© Sistem Akreditasi SIB - All rights reserved</p>
-            <p>
-                <a href="#">Terms & Condition</a> | <a href="#">Privacy Policy</a> | <a href="#">Contact us</a>
-            </p>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-left">
+        <div class="logo-row">
+          <img src="{{ asset('landing_page/logo/Logo Polinema 4.png') }}" alt="Polinema">
+          <img src="{{ asset('landing_page/logo/logo_jti.png') }}" alt="JTI">
         </div>
-    </footer>
+        <div class="address">
+          <strong>Politeknik Negeri Malang</strong><br>
+          Jl. Soekarno Hatta No.9, Jatimulyo, Kec. Lowokwaru,<br>
+          Kota Malang, Jawa Timur 65141<br>
+          <div class="telepon"><i class="bi bi-telephone"></i>(0341) 404424</div>
+        </div>
+      </div>
+
+      <div class="footer-right">
+        <h4>Social Media:</h4>
+        <div class="social-icons">
+          <img src="{{ asset('landing_page/icons/icon_instagram.png') }}" alt="Instagram">
+          <img src="{{ asset('landing_page/icons/icon_gmail.png') }}" alt="Gmail">
+          <img src="{{ asset('landing_page/icons/icon_facebook.png') }}" alt="Facebook">
+          <img src="{{ asset('landing_page/icons/icon_x.png') }}" alt="X">
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>© Kelompok 3 SIB 2A – All rights reserved</div>
+      <div class="links">
+        <a href="#">Terms & Condition</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Contact us</a>
+      </div>
+    </div>
+  </footer>
+
 </body>
 </html>
