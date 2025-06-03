@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Models\DetailKriteriaModel;
 
 class DashboardController extends Controller
 {
@@ -27,12 +28,37 @@ class DashboardController extends Controller
             default => 'dashboard.default'
         };
 
+        // Filter hanya kriteria yang sesuai dengan id_user admin
+        $id_kriteria = $user->id_user; // Admin1 -> Kriteria 1, Admin2 -> Kriteria 2, dst.
+
+        // Ambil data jumlah data pendukung per kategori
+        $categoryCounts = DetailKriteriaModel::with(['kategori', 'dataPendukung'])
+            ->where('id_kriteria', $id_kriteria)
+            ->get()
+            ->groupBy('id_kategori_kriteria')
+            ->mapWithKeys(function ($group, $id) {
+                $categoryName = $group->first()->kategori->nama_kategori ?? 'Unknown';
+                return [$id => [
+                    'count' => $group->sum(function ($item) {
+                        return $item->dataPendukung->count();
+                    }),
+                    'name' => $categoryName,
+                    'class' => strtolower(str_replace(' ', '', $categoryName))
+                ]];
+            });
+
+        $categories = $categoryCounts->pluck('name')->values()->toArray();
+        $counts = $categoryCounts->pluck('count')->values()->toArray();
+
         return view($view, [
             'breadcrumb' => (object) [
                 'title' => 'Dashboard ' . $level_kode,
                 'list' => ['Home', 'Dashboard']
             ],
-            'activeMenu' => 'dashboard'
+            'activeMenu' => 'dashboard',
+            'categoryCounts' => $categoryCounts,
+            'categories' => $categories,
+            'counts' => $counts,
         ]);
     }
 }

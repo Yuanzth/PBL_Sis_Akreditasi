@@ -250,6 +250,34 @@ class KriteriaController extends Controller
         // Redirect dengan pesan sukses
         return redirect()->route('dashboard')->with('success', 'Kriteria berhasil disubmit dan PDF telah dihasilkan');
     }
+    /**
+     * Menghapus data pendukung.
+     */
+    public function deleteData(Request $request, $id, $dataId)
+    {
+        $request->validate([
+            'id_data_pendukung' => 'required|exists:t_data_pendukung,id_data_pendukung'
+        ]);
+
+        $dataPendukung = DataPendukungModel::findOrFail($request->id_data_pendukung);
+        $kriteria = KriteriaModel::where('id_kriteria', $id)
+            ->where('id_user', Auth::user()->id_user)
+            ->firstOrFail();
+
+        // Hapus gambar terkait
+        $gambar = GambarModel::where('id_data_pendukung', $dataPendukung->id_data_pendukung)->get();
+        foreach ($gambar as $img) {
+            Storage::disk('public')->delete($img->gambar);
+            $img->delete();
+        }
+
+        // Hapus data pendukung
+        $dataPendukung->delete();
+
+        Log::info('Data pendukung dihapus untuk id_kriteria: ' . $id, ['user_id' => Auth::user()->id_user, 'id_data_pendukung' => $request->id_data_pendukung]);
+
+        return response()->json(['message' => 'Data berhasil dihapus']);
+    }
 
     /**
      * Menghapus draft gambar yang diupload 
