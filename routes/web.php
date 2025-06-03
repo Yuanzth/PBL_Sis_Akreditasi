@@ -15,6 +15,8 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/home', [WelcomeController::class, 'index'])->name('home');
     Route::get('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/login', [AuthController::class, 'postlogin']);
+    // Acccessor Kriteria
+   Route::get('/public/kriteria/{id}', [WelcomeController::class, 'index'])->name('home.kriteria');
 });
 
 // Rute untuk pengguna yang sudah login

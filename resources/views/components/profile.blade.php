@@ -1,4 +1,4 @@
-<div class="section section-profile bg-light py-5">
+<div id="profile" class="section section-profile bg-light py-5">
     <div class="container">
         <h2 class="text-left mb-5" style="color: #0B6B4F; font-weight: bold;">Profile Polinema</h2>
         <div class="row align-items-start">
