@@ -60,16 +60,17 @@
         opacity: 1;
     }
 
-    .placeholder-chart {
-        background: #eee;
+    .chart-container {
+        background: #fff;
         border-radius: 12px;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: #555;
-        font-size: 14px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
         min-height: 500px;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
     .penetapan {
@@ -95,21 +96,67 @@
 @endpush
 
 @push('js')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            @if (session('success'))
-                Swal.fire({
-                    title: 'Sukses!',
-                    text: '{{ session('success') }}',
-                    icon: 'success',
-                    confirmButtonColor: '#2ecc71',
-                    timer: 3000,
-                    timerProgressBar: true
-                });
-            @endif
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        @if (session('success'))
+            Swal.fire({
+                title: 'Sukses!',
+                text: '{{ session('success') }}',
+                icon: 'success',
+                confirmButtonColor: '#2ecc71',
+                timer: 3000,
+                timerProgressBar: true
+            });
+        @endif
+
+        // Bar Chart
+        const ctx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: @json($categories),
+                datasets: [{
+                    label: 'Jumlah Data Pendukung',
+                    data: @json($counts),
+                    backgroundColor: ['#23C3D8', '#1CA7EC', '#787FF6', '#4B77BE', '#4555BA'],
+                    borderColor: ['#1A9BAE', '#1486C2', '#5E63C2', '#3A5E94', '#364790'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        stepSize: 1, // Langkah skala hanya dalam angka bulat
+                        title: {
+                            display: true,
+                            text: 'Jumlah Data'
+                        },
+                        ticks: {
+                            precision: 0 // Pastikan tidak ada desimal pada ticks
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Kategori'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                }
+            }
         });
-    </script>
+    });
+</script>
 @endpush
 
 @section('content')
@@ -123,56 +170,22 @@
     <div class="dashboard-grid">
         <!-- Left Grid -->
         <div class="category-grid">
-            <div class="info-box penetapan">
-                <div class="info-box-content">
-                    <span class="info-box-text">Penetapan</span>
-                    <span class="info-box-number">4</span>
+            @foreach ($categoryCounts as $id => $data)
+                <div class="info-box {{ $data['class'] }}">
+                    <div class="info-box-content">
+                        <span class="info-box-text">{{ $data['name'] }}</span>
+                        <span class="info-box-number">{{ $data['count'] }}</span>
+                    </div>
+                    <span class="info-box-icon">
+                        <img src="{{ asset('dashboard/icons/icon_' . $data['class'] . '.png') }}" alt="{{ $data['name'] }} Icon">
+                    </span>
                 </div>
-                <span class="info-box-icon">
-                    <img src="{{ asset('dashboard/icons/icon_penetapan.png') }}" alt="Penetapan Icon">
-                </span>
-            </div>
-            <div class="info-box pelaksanaan">
-                <div class="info-box-content">
-                    <span class="info-box-text">Pelaksanaan</span>
-                    <span class="info-box-number">4</span>
-                </div>
-                <span class="info-box-icon">
-                    <img src="{{ asset('dashboard/icons/icon_pelaksanaan.png') }}" alt="Pelaksanaan Icon">
-                </span>
-            </div>
-            <div class="info-box evaluasi">
-                <div class="info-box-content">
-                    <span class="info-box-text">Evaluasi</span>
-                    <span class="info-box-number">4</span>
-                </div>
-                <span class="info-box-icon">
-                    <img src="{{ asset('dashboard/icons/icon_evaluasi.png') }}" alt="Evaluasi Icon">
-                </span>
-            </div>
-            <div class="info-box pengendalian">
-                <div class="info-box-content">
-                    <span class="info-box-text">Pengendalian</span>
-                    <span class="info-box-number">4</span>
-                </div>
-                <span class="info-box-icon">
-                    <img src="{{ asset('dashboard/icons/icon_pengendalian.png') }}" alt="Pengendalian Icon">
-                </span>
-            </div>
-            <div class="info-box peningkatan">
-                <div class="info-box-content">
-                    <span class="info-box-text">Peningkatan</span>
-                    <span class="info-box-number">4</span>
-                </div>
-                <span class="info-box-icon">
-                    <img src="{{ asset('dashboard/icons/icon_peningkatan.png') }}" alt="Peningkatan Icon">
-                </span>
-            </div>
+            @endforeach
         </div>
 
-        <!-- Right Placeholder -->
-        <div class="placeholder-chart">
-            Bar chart seluruh kategori nanti
+        <!-- Right Bar Chart -->
+        <div class="chart-container">
+            <canvas id="categoryChart" style="width: 100%; height: 100%;"></canvas>
         </div>
     </div>
 </div>
