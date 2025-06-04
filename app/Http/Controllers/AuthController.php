@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -37,11 +38,17 @@ class AuthController extends Controller
                 ], 422);
             }
 
-            $credentials = $request->only('username', 'password');
+            // Ambil username dan password dari request
+            $username = $request->input('username');
+            $password = $request->input('password');
 
-            if (Auth::attempt($credentials)) {
+            // Cari user berdasarkan username secara case-sensitive
+            $user = UserModel::where('username', $username)->first();
+
+            if ($user && Hash::check($password, $user->password)) {
+                // Jika username dan password cocok, login user
+                Auth::login($user);
                 $request->session()->regenerate();
-                $user = Auth::user();
                 Log::info('Login successful', ['user_id' => $user->id_user, 'level_kode' => $user->level->level_kode]);
 
                 return response()->json([
@@ -51,7 +58,8 @@ class AuthController extends Controller
                 ]);
             }
 
-            Log::warning('Login failed', ['username' => $request->username]);
+            // Jika username atau password salah
+            Log::warning('Login failed', ['username' => $username]);
             return response()->json([
                 'status' => false,
                 'message' => 'Username atau kata sandi salah',

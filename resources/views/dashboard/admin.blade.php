@@ -27,15 +27,18 @@
         grid-gap: 15px;
     }
 
-    .category-grid .info-box {
+    .category-grid .info-box,
+    .category-grid .kriteria-button {
         color: white;
         border-radius: 10px;
         padding: 15px 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        min-height: 80px;
+        height: 140px; /* Memastikan tinggi sama untuk semua elemen */
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        transition: background-color 0.3s;
+        box-sizing: border-box; /* Memastikan padding tidak menambah tinggi */
     }
 
     .info-box-content {
@@ -45,7 +48,7 @@
     }
 
     .info-box-text {
-        font-size: 13px;
+        font-size: 16px;
         font-weight: 500;
     }
 
@@ -92,6 +95,24 @@
     .peningkatan {
         background-color: #4555BA;
     }
+
+    /* Style khusus untuk tombol */
+    .kriteria-button {
+        background-color: #4555BA; /* Warna sama dengan peningkatan */
+        text-decoration: none;
+    }
+
+    .kriteria-button:hover {
+        background-color: #364790; /* Warna lebih gelap saat hover */
+    }
+
+    .kriteria-button .info-box-text {
+        font-size: 20px; /* Menyesuaikan ukuran teks agar lebih terbaca */
+    }
+
+    .kriteria-button .info-box-icon i {
+        font-size: 24px; /* Ukuran ikon panah */
+    }
 </style>
 @endpush
 
@@ -131,13 +152,13 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        stepSize: 1, // Langkah skala hanya dalam angka bulat
+                        stepSize: 1,
                         title: {
                             display: true,
                             text: 'Jumlah Data'
                         },
                         ticks: {
-                            precision: 0 // Pastikan tidak ada desimal pada ticks
+                            precision: 0
                         }
                     },
                     x: {
@@ -181,6 +202,20 @@
                     </span>
                 </div>
             @endforeach
+
+            <!-- Tombol Kriteria -->
+            @php
+                $kriteriaId = Auth::user()->id_level - 4; // Misalnya Admin1 (id_level=5) -> Kriteria 1
+                $kriteriaLink = route('kriteria.edit', $kriteriaId);
+            @endphp
+            <a href="{{ $kriteriaLink }}" class="kriteria-button">
+                <div class="info-box-content">
+                    <span class="info-box-text">Kelola Kriteria {{ $kriteriaId }}</span>
+                </div>
+                <span class="info-box-icon">
+                    <i class="fas fa-arrow-right"></i>
+                </span>
+            </a>
         </div>
 
         <!-- Right Bar Chart -->

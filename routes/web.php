@@ -7,8 +7,10 @@ use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\ValidasiTahapDuaController;
 use App\Http\Controllers\FinalisasiController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ManageKriteriaController;
+use App\Http\Controllers\ManageUserController;
+use Illuminate\Support\Facades\Route;
 
 // Rute untuk tamu (pengguna yang belum login)
 Route::middleware(['guest'])->group(function () {
@@ -16,7 +18,7 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/login', [AuthController::class, 'postlogin']);
     // Acccessor Kriteria
-   Route::get('/public/kriteria/{id}', [WelcomeController::class, 'index'])->name('home.kriteria');
+    Route::get('/public/kriteria/{id}', [WelcomeController::class, 'index'])->name('home.kriteria');
 });
 
 // Rute untuk pengguna yang sudah login
@@ -51,24 +53,21 @@ Route::prefix('kriteria')->group(function () {
 });
 
 Route::prefix('finalisasi-dokumen')->middleware(['auth'])->group(function () {
-    Route::get('/', [App\Http\Controllers\FinalisasiController::class, 'index'])->name('finalisasi.index');
-    Route::post('/list', [App\Http\Controllers\FinalisasiController::class, 'list'])->name('finalisasi.list');
-    Route::get('/export', [App\Http\Controllers\FinalisasiController::class, 'export'])->name('finalisasi.export');
-    Route::get('/show/{id}', [App\Http\Controllers\FinalisasiController::class, 'showFinal'])->name('finalisasi.showFinal');
+    Route::get('/', [FinalisasiController::class, 'index'])->name('finalisasi.index');
+    Route::post('/list', [FinalisasiController::class, 'list'])->name('finalisasi.list');
+    Route::get('/export', [FinalisasiController::class, 'export'])->name('finalisasi.export');
+    Route::get('/show/{id}', [FinalisasiController::class, 'showFinal'])->name('finalisasi.showFinal');
 });
-// // Rute untuk KJM
-// Route::middleware(['auth'])->group(function () {
-//     Route::get('/validasi-data', [ValidasiKJMController::class, 'index']);
-//     Route::get('/validasi-data/{id}/lihat', [ValidasiKJMController::class, 'show']);
-//     Route::put('/validasi-data/{id}/update', [ValidasiKJMController::class, 'updateStatus']);
-    
-// });
-// // Rute untuk DIR
-// Route::middleware(['auth'])->group(function () {
-//     Route::get('/validasi-data', [ValidasiDirController::class, 'index']);
-//     Route::get('/validasi-data/{id}/lihat', [ValidasiDirController::class, 'show']);
-//     Route::put('/validasi-data/{id}/update', [ValidasiDirController::class, 'updateStatus']);
-//     Route::get('/finalisasi-dokumen', [FinalDocumentController::class, 'index'])->name('finalisasi.index');
-//     Route::get('/finalisasi', [FinalDocumentController::class, 'index'])->name('finalisasi.index');
-//     Route::get('/finalisasi/export-pdf', [FinalDocumentController::class, 'exportPdf'])->name('finalisasi.export.pdf');
-// });
+
+// Rute untuk SuperAdmin
+Route::middleware(['auth'])->group(function () {
+    Route::prefix('manage-users')->group(function () {
+        Route::get('/', [ManageUserController::class, 'index'])->name('users.manage');
+        Route::post('/create', [ManageUserController::class, 'create'])->name('users.create');
+    });
+
+    Route::prefix('manage-kriteria')->group(function () {
+        Route::get('/', [ManageKriteriaController::class, 'index'])->name('kriteria.manage');
+        Route::post('/create', [ManageKriteriaController::class, 'create'])->name('kriteria.create');
+    });
+});

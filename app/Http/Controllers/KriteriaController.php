@@ -8,7 +8,7 @@ use App\Models\DataPendukungModel;
 use App\Models\GambarModel;
 use App\Models\KomentarModel;
 use App\Models\GeneratedDocumentModel;
-use App\Models\ValidasiModel; // Tambahkan model ValidasiModel
+use App\Models\ValidasiModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -22,13 +22,12 @@ class KriteriaController extends Controller
      */
     public function edit($id)
     {
-        // Cek apakah Admin memiliki akses ke id_kriteria
-        $kriteria = KriteriaModel::where('id_kriteria', $id)
-            ->where('id_user', Auth::user()->id_user)
-            ->first();
+        // Cek apakah Admin memiliki akses ke id_kriteria berdasarkan id_level
+        $user = Auth::user();
+        $kriteria = KriteriaModel::where('id_kriteria', $id)->first();
 
-        if (!$kriteria) {
-            Log::error('Akses ditolak untuk id_kriteria: ' . $id, ['user_id' => Auth::user()->id_user]);
+        if (!$kriteria || $kriteria->id_level !== $user->id_level) {
+            Log::error('Akses ditolak untuk id_kriteria: ' . $id, ['user_id' => $user->id_user, 'id_level' => $user->id_level]);
             abort(403, 'Akses ditolak');
         }
 
@@ -60,8 +59,9 @@ class KriteriaController extends Controller
      */
     public function save(Request $request, $id)
     {
+        $user = Auth::user();
         $kriteria = KriteriaModel::where('id_kriteria', $id)
-            ->where('id_user', Auth::user()->id_user)
+            ->where('id_level', $user->id_level)
             ->firstOrFail();
 
         $request->validate([
@@ -114,9 +114,9 @@ class KriteriaController extends Controller
                     ->whereIn('id_detail_kriteria', $detailKriteriaIds)
                     ->where('draft', true);
             })->update(['draft' => false]);
-            Log::info('Data pendukung disimpan final untuk id_kriteria: ' . $id, ['user_id' => Auth::user()->id_user]);
+            Log::info('Data pendukung disimpan final untuk id_kriteria: ' . $id, ['user_id' => $user->id_user]);
         } else {
-            Log::info('Data pendukung disimpan sebagai draft untuk id_kriteria: ' . $id, ['user_id' => Auth::user()->id_user]);
+            Log::info('Data pendukung disimpan sebagai draft untuk id_kriteria: ' . $id, ['user_id' => $user->id_user]);
         }
 
         // Jika request adalah AJAX, kembalikan response JSON
@@ -132,13 +132,13 @@ class KriteriaController extends Controller
      */
     public function submit(Request $request, $id)
     {
-        // Cek akses
+        $user = Auth::user();
         $kriteria = KriteriaModel::where('id_kriteria', $id)
-            ->where('id_user', Auth::user()->id_user)
+            ->where('id_level', $user->id_level)
             ->first();
 
         if (!$kriteria) {
-            Log::error('Akses ditolak untuk id_kriteria: ' . $id, ['user_id' => Auth::user()->id_user]);
+            Log::error('Akses ditolak untuk id_kriteria: ' . $id, ['user_id' => $user->id_user, 'id_level' => $user->id_level]);
             abort(403, 'Akses ditolak');
         }
 
@@ -189,11 +189,11 @@ class KriteriaController extends Controller
         // Hapus semua entri validasi terkait di t_validasi sebelum submit
         try {
             ValidasiModel::where('id_kriteria', $id)->delete();
-            Log::info('Entri validasi dihapus untuk id_kriteria: ' . $id, ['user_id' => Auth::user()->id_user]);
+            Log::info('Entri validasi dihapus untuk id_kriteria: ' . $id, ['user_id' => $user->id_user]);
         } catch (\Exception $e) {
             Log::error('Gagal menghapus entri validasi untuk id_kriteria: ' . $id, [
                 'error' => $e->getMessage(),
-                'user_id' => Auth::user()->id_user
+                'user_id' => $user->id_user
             ]);
             return redirect()->route('dashboard')->with('error', 'Gagal menghapus entri validasi lama: ' . $e->getMessage());
         }
@@ -214,12 +214,12 @@ class KriteriaController extends Controller
         $pdf = PDF::loadHTML($html);
         $timestamp = time();
         $fileName = "kriteria_{$id}_{$timestamp}.pdf";
-        $pdfPath = 'pdf/' . $fileName; // Path relatif untuk storage/app/public/pdf/
+        $pdfPath = 'pdf/' . $fileName;
 
         // Cek dan hapus semua dokumen lama untuk id_kriteria ini
         $existingDocuments = GeneratedDocumentModel::where('id_kriteria', $id)->get();
         foreach ($existingDocuments as $existingDocument) {
-            $oldFilePath = $existingDocument->generated_document; // Path relatif seperti 'pdf/kriteria_1_1748190421.pdf'
+            $oldFilePath = $existingDocument->generated_document;
             if (Storage::disk('public')->exists($oldFilePath)) {
                 if (!Storage::disk('public')->delete($oldFilePath)) {
                     Log::error('Gagal menghapus file lama untuk id_kriteria: ' . $id, ['path' => $oldFilePath]);
@@ -240,16 +240,16 @@ class KriteriaController extends Controller
         // Simpan path ke t_generated_document
         GeneratedDocumentModel::create([
             'id_kriteria' => $id,
-            'generated_document' => $pdfPath, // Simpan path relatif
+            'generated_document' => $pdfPath,
         ]);
 
-        Log::info('PDF generated and saved for id_kriteria: ' . $id, ['user_id' => Auth::user()->id_user, 'path' => $pdfPath]);
+        Log::info('PDF generated and saved for id_kriteria: ' . $id, ['user_id' => $user->id_user, 'path' => $pdfPath]);
 
-        Log::info('Kriteria disubmit untuk id_kriteria: ' . $id, ['user_id' => Auth::user()->id_user]);
+        Log::info('Kriteria disubmit untuk id_kriteria: ' . $id, ['user_id' => $user->id_user]);
 
-        // Redirect dengan pesan sukses
         return redirect()->route('dashboard')->with('success', 'Kriteria berhasil disubmit dan PDF telah dihasilkan');
     }
+
     /**
      * Menghapus data pendukung.
      */
@@ -261,7 +261,7 @@ class KriteriaController extends Controller
 
         $dataPendukung = DataPendukungModel::findOrFail($request->id_data_pendukung);
         $kriteria = KriteriaModel::where('id_kriteria', $id)
-            ->where('id_user', Auth::user()->id_user)
+            ->where('id_level', Auth::user()->id_level)
             ->firstOrFail();
 
         // Hapus gambar terkait
@@ -285,7 +285,7 @@ class KriteriaController extends Controller
     public function deleteGambar(Request $request, $id, $gambarId)
     {
         $kriteria = KriteriaModel::where('id_kriteria', $id)
-            ->where('id_user', Auth::user()->id_user)
+            ->where('id_level', Auth::user()->id_level)
             ->firstOrFail();
 
         $gambar = GambarModel::findOrFail($gambarId);

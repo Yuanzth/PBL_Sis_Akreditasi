@@ -232,11 +232,26 @@
                             }
                         },
                         error: function(xhr) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Terjadi Kesalahan',
-                                text: 'Gagal menghubungi server. Silakan coba lagi.'
-                            });
+                            if (xhr.status === 401) {
+                                // Error autentikasi (username/password salah)
+                                $('.error-text').text('');
+                                const response = xhr.responseJSON;
+                                $.each(response.msgField, function(prefix, val) {
+                                    $('#error-' + prefix).text(val[0]);
+                                });
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Terjadi Kesalahan',
+                                    text: response.message
+                                });
+                            } else {
+                                // Error server lainnya
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Terjadi Kesalahan',
+                                    text: 'Gagal menghubungi server. Silakan coba lagi.'
+                                });
+                            }
                         }
                     });
                     return false;

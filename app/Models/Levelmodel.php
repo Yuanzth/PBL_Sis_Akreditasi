@@ -19,4 +19,9 @@ class LevelModel extends Model
     {
         return $this->hasMany(UserModel::class, 'id_level', 'id_level');
     }
+
+    public function kriteria()
+    {
+        return $this->hasMany(KriteriaModel::class, 'id_level');
+    }
 }
