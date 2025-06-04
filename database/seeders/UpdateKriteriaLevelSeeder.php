@@ -23,9 +23,9 @@ class UpdateKriteriaLevelSeeder extends Seeder
         ];
 
         // Perbarui id_level di m_kriteria berdasarkan id_user
-        foreach ($mapping as $id_user => $id_level) {
+        foreach ($mapping as $id_kriteria => $id_level) {
             DB::table('m_kriteria')
-                ->where('id_user', $id_user)
+                ->where('id_kriteria', $id_kriteria)
                 ->update(['id_level' => $id_level]);
         }
     }
