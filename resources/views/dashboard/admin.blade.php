@@ -98,12 +98,12 @@
 
     /* Style khusus untuk tombol */
     .kriteria-button {
-        background-color: #4555BA; /* Warna sama dengan peningkatan */
+        background-color: #45ba4b; /* Warna sama dengan peningkatan */
         text-decoration: none;
     }
 
     .kriteria-button:hover {
-        background-color: #364790; /* Warna lebih gelap saat hover */
+        background-color: #32683b; /* Warna lebih gelap saat hover */
     }
 
     .kriteria-button .info-box-text {
