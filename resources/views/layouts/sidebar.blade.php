@@ -150,25 +150,11 @@
             </nav>
         </div>
     </div>
-    <!-- Logout Button -->
-    <div style="padding: 15px;">
-        <a href="{{ route('logout') }}" class="nav-link"
-            style="color: #FFFFFF; padding: 10px 15px; display: flex; align-items: center; background-color: transparent;"
-            onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-            onmouseover="this.style.backgroundColor='#4CAF50'; this.style.color='#FFFFFF';"
-            onmouseout="this.style.backgroundColor='transparent'; this.style.color='#FFFFFF';">
-            <i class="nav-icon fas fa-sign-out-alt" style="color: #FFFFFF; margin-right: 15px;"></i>
-            <p style="color: #FFFFFF; margin:0 ;">Logout</p>
-        </a>
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-            @csrf
-        </form>
-    </div>
 </div>
 
 @push('css')
     <style>
-        /* Ensure dropdown stays within sidebar */
+        /* dropdown tetap di dalam sidebar */
         .nav-treeview {
             width: 100%;
             box-sizing: border-box;
@@ -183,9 +169,57 @@
             box-sizing: border-box;
         }
 
-        /* Sembunyikan teks logout saat sidebar collapse */
-        .sidebar-collapse .logout-text {
-            display: none !important;
+        /* Memusatkan ikon di mode sidebar-mini saat sidebar di-collapse */
+        .sidebar-mini.sidebar-collapse .nav-link {
+            display: flex;
+            justify-content: center; 
+            align-items: center; 
+            padding: 0; 
+            margin: 0 auto; 
+            width: 100%; 
+        }
+
+        /* hide teks di mode mini */
+        .sidebar-mini.sidebar-collapse .nav-link p {
+            display: none; /* hide teks saat sidebar di-minimize */
+        }
+
+        .sidebar-mini.sidebar-collapse .nav-icon {
+            margin: 0 auto; 
+            font-size: 1.2rem;
+            line-height: 1; 
+        }
+
+        /*  ikon berupa gambar */
+        .sidebar-mini.sidebar-collapse .nav-icon[src] {
+            margin: 0 auto;
+            width: 24px; 
+            height: 24px;
+        }
+
+        .sidebar-mini.sidebar-collapse .nav-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50px; 
+            margin: 0;
+        }
+
+        .sidebar-mini.sidebar-collapse .main-sidebar {
+            width: 60px; 
+        }
+
+        .sidebar-mini.sidebar-collapse .sidebar {
+            overflow: hidden;
+        }
+
+        .sidebar-mini.sidebar-collapse .nav-header {
+            display: none;
+        }
+
+        .sidebar-mini.sidebar-collapse .nav-pills {
+            padding: 0;
+            margin: 0;
         }
     </style>
 @endpush
