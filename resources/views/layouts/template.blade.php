@@ -19,6 +19,54 @@
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('adminlte/dist/css/adminlte.min.css') }}">
     @stack('css')
+
+    <!-- CSS untuk logo JTI -->
+    <style>
+        /* sidebar mode full */
+        .layout-fixed .main-sidebar {
+            width: 250px; 
+        }
+
+        /* set brand-link saat sidebar penuh */
+        .brand-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px; 
+            background-color: #D9D9D9; 
+        }
+
+        /* logo JTI */
+        .brand-link img {
+            height: 40px; /* Tetap ukuran logo */
+            width: auto; /* lebar menyesuaikan proporsi */
+            margin-right: 11px; /* jarak antara logo dan teks */
+        }
+
+        /* teks brand */
+        .brand-text {
+            font-size: 1.2rem;
+            color: #000000; 
+            font-weight: 600; 
+        }
+
+        /*  logo JTI saat sidebar di-minimize */
+        .sidebar-mini.sidebar-collapse .brand-link {
+            display: flex;
+            justify-content: center; 
+            align-items: center; 
+            padding: 10px;
+        }
+
+        /* hide teks saat sidebar di-minimize */
+        .sidebar-mini.sidebar-collapse .brand-text {
+            display: none;
+        }
+
+        /*ukuran saat di-minimize */
+        .sidebar-mini.sidebar-collapse .brand-link img {
+            margin: 0; 
+        }
+    </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -33,7 +81,6 @@
             <!-- Brand Logo -->
             <a href="{{ url('/') }}" class="brand-link">
                 <img src="{{ asset('landing_page/logo/logo_jti.png') }}" alt="JTI Logo" height="40" width="40">
-                    
                 <span class="brand-text font-weight-light" style="color: rgb(0, 0, 0);"><b>Sistem Akreditasi SIB</b></span>
             </a>
 

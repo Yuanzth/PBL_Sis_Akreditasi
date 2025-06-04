@@ -18,6 +18,8 @@
                   src="{{ auth()->user()->photo_profile ? asset('storage/' . auth()->user()->photo_profile) : asset('adminlte/dist/img/default-profile.jpg') }}"
                   class="user-image img-circle elevation-1" alt="User Image">
               <span class="d-none d-md-inline">{{ auth()->user()->name }}</span>
+              <!-- ikon dropdown -->
+              <i class="fas fa-chevron-down ml-1"></i>
           </a>
           <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
               <!-- User image -->
@@ -44,3 +46,19 @@
       </li>
   </ul>
 </nav>
+
+@push('css')
+    <style>
+        /* Sesuaikan posisi ikon dropdown */
+        .nav-link.dropdown-toggle .fa-chevron-down {
+            font-size: 0.8rem; /* Sesuaikan ukuran ikon */
+            vertical-align: middle; 
+            margin-left: 5px; 
+        }
+
+        /* hover pada dropdown */
+        .nav-link.dropdown-toggle:hover .fa-chevron-down {
+            color: #007bff; 
+        }
+    </style>
+@endpush
