@@ -33,9 +33,9 @@ class ValidasiTahapSatuController extends Controller
                 ->with([
                     'validasi' => function ($query) {
                         $query->whereIn('id_user', [10, 11, 12, 13])
-                            ->orderBy('updated_at', 'desc');
-                    },
-                    'validasi.user'
+                            ->orderBy('updated_at', 'desc')
+                            ->with('user'); // Memuat relasi user melalui validasi
+                    }
                 ])
                 ->whereIn('id_kriteria', range(1, 9));
 
@@ -145,9 +145,9 @@ class ValidasiTahapSatuController extends Controller
             $kriteria = KriteriaModel::with([
                 'validasi' => function ($query) {
                     $query->whereIn('id_user', [10, 11, 12, 13])
-                        ->orderBy('updated_at', 'desc');
-                },
-                'user'
+                        ->orderBy('updated_at', 'desc')
+                        ->with('user'); // Memuat relasi user melalui validasi
+                }
             ])->findOrFail($id);
 
             $generatedDocument = GeneratedDocumentModel::where('id_kriteria', $id)->first();
