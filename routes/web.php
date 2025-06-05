@@ -70,6 +70,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('manage-kriteria')->group(function () {
         Route::get('/', [ManageKriteriaController::class, 'index'])->name('kriteria.manage');
-        Route::post('/create', [ManageKriteriaController::class, 'create'])->name('kriteria.create');
+        Route::get('/{id}', [ManageKriteriaController::class, 'show'])->name('kriteria.show');
+        Route::put('/{id}', [ManageKriteriaController::class, 'update'])->name('kriteria.update');
     });
 });
