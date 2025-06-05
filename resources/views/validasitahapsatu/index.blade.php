@@ -13,18 +13,6 @@
         @if (session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
-        <!-- Filter Section -->
-        <div class="row mb-3">
-            <div class="col-md-3">
-                <label for="filter_status">Status Validasi</label>
-                <select id="filter_status" class="form-control">
-                    <option value="">Semua Status</option>
-                    <option value="Valid">Valid</option>
-                    <option value="Ditolak">Ditolak</option>
-                    <option value="On Progress">On Progress</option>
-                </select>
-            </div>
-        </div>
         <table class="table table-bordered table-striped table-hover table-sm" id="table_validasi">
             <thead>
                 <tr>

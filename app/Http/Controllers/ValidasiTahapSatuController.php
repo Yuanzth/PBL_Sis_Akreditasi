@@ -44,7 +44,7 @@ class ValidasiTahapSatuController extends Controller
             if ($statusFilter) {
                 $query->whereHas('validasi', function ($query) use ($statusFilter) {
                     $query->whereIn('id_user', [10, 11])
-                          ->where('status', $statusFilter);
+                        ->where('status', $statusFilter);
                 });
             }
 
@@ -124,6 +124,8 @@ class ValidasiTahapSatuController extends Controller
                     if ($row->status_selesai === 'Submitted' && !$validasiTahapSatuSetelahSubmit) {
                         $button .= '<a href="' . route('validasi.tahap.satu.show', $row->id_kriteria) . '" class="btn btn-sm btn-info btn-active mr-1 position-relative">Lihat<span class="badge-exclamation">!</span></a>';
                     } elseif ($validasiTahapSatuSetelahSubmit && $validasiTahapSatuSetelahSubmit->status === 'Valid' && (!$validasiTahapDuaSetelahSubmit || $validasiTahapDuaSetelahSubmit->status !== 'Valid')) {
+                        $button .= '<a href="' . route('validasi.tahap.satu.show', $row->id_kriteria) . '" class="btn btn-sm btn-info btn-validated mr-1">Lihat</a>';
+                    } elseif ($validasiTahapDuaSetelahSubmit && $validasiTahapDuaSetelahSubmit->status === 'Valid') {
                         $button .= '<a href="' . route('validasi.tahap.satu.show', $row->id_kriteria) . '" class="btn btn-sm btn-info btn-validated mr-1">Lihat</a>';
                     } else {
                         $button .= '<button onclick="showNotSubmittedAlert()" class="btn btn-sm btn-info btn-disabled mr-1">Lihat</button>';

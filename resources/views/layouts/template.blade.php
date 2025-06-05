@@ -115,9 +115,7 @@
     <script src="{{ asset('adminlte/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
     <!-- AdminLTE App -->
     <script src="{{ asset('adminlte/dist/js/adminlte.min.js') }}"></script>
-    <!-- CKEditor 5 CDN -->
-    <script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.umd.js"></script>
-
+    
     <script>
         $.ajaxSetup({
             headers: {
