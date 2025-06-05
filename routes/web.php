@@ -27,11 +27,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/profile', [UserController::class, 'profile']);
     Route::post('/updatephoto', [UserController::class, 'updatePhoto']);
-    
+
     // Rute untuk Validasi Tahap Satu
     Route::get('/validasitahapsatu', [ValidasiTahapSatuController::class, 'index'])->name('validasi.tahap.satu');
     Route::post('/validasitahapsatu/list', [ValidasiTahapSatuController::class, 'list'])->name('validasi.tahap.satu.list');
-    Route::get('/validasitahapsatu/{id}/show', [ValidasiTahapSatuController::class, 'show'])->name('validasi.tahap.satu.show'); 
+    Route::get('/validasitahapsatu/{id}/show', [ValidasiTahapSatuController::class, 'show'])->name('validasi.tahap.satu.show');
     Route::post('/validasitahapsatu/{id}/approve', [ValidasiTahapSatuController::class, 'approve'])->name('validasi.tahap.satu.approve');
     Route::post('/validasitahapsatu/{id}/reject', [ValidasiTahapSatuController::class, 'reject'])->name('validasi.tahap.satu.reject');
 
@@ -64,10 +64,13 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('manage-users')->group(function () {
         Route::get('/', [ManageUserController::class, 'index'])->name('users.manage');
         Route::post('/create', [ManageUserController::class, 'create'])->name('users.create');
+        Route::get('/{id}', [ManageUserController::class, 'show'])->name('users.show');
+        Route::put('/{id}', [ManageUserController::class, 'update'])->name('users.update');
     });
 
     Route::prefix('manage-kriteria')->group(function () {
         Route::get('/', [ManageKriteriaController::class, 'index'])->name('kriteria.manage');
-        Route::post('/create', [ManageKriteriaController::class, 'create'])->name('kriteria.create');
+        Route::get('/{id}', [ManageKriteriaController::class, 'show'])->name('kriteria.show');
+        Route::put('/{id}', [ManageKriteriaController::class, 'update'])->name('kriteria.update');
     });
 });

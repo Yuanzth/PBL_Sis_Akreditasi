@@ -21,6 +21,7 @@
                         <th>Username</th>
                         <th>Nama</th>
                         <th>Level</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,6 +31,10 @@
                             <td>{{ $user->username }}</td>
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->level->level_nama }}</td>
+                            <td>
+                                <button class="btn btn-info btn-sm btn-detail" data-id="{{ $user->id_user }}"><i class="fas fa-eye"></i> Detail</button>
+                                <button class="btn btn-warning btn-sm btn-edit" data-id="{{ $user->id_user }}"><i class="fas fa-edit"></i> Edit</button>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -78,6 +83,80 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Detail Pengguna -->
+    <div class="modal fade" id="detailUserModal" tabindex="-1" role="dialog" aria-labelledby="detailUserModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Pengguna</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="detailUsername" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Nama</label>
+                        <input type="text" id="detailName" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Level</label>
+                        <input type="text" id="detailLevel" class="form-control" readonly>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Pengguna -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Pengguna</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="id_user" id="editUserId">
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" name="username" id="editUsername" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nama</label>
+                            <input type="text" name="name" id="editName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password (Kosongkan jika tidak ingin mengubah)</label>
+                            <input type="password" name="password" id="editPassword" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Level</label>
+                            <select name="id_level" id="editLevelId" class="form-control" required>
+                                @foreach (\App\Models\LevelModel::all() as $level)
+                                    <option value="{{ $level->id_level }}">{{ $level->level_nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button class="btn btn-primary" id="submitEditUserForm">Simpan Perubahan</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('css')
@@ -91,7 +170,7 @@
         }
 
         .card-header {
-            background-color: #007bff;
+            background-color: rgb(11, 107, 79);
             color: white;
             font-weight: 600;
         }
@@ -120,7 +199,7 @@
         }
 
         .modal-header {
-            background-color: #007bff;
+            background-color: rgb(11, 107, 79);
             color: white;
         }
 
@@ -142,6 +221,14 @@
         .btn-secondary {
             background-color: #6c757d;
             border-color: #6c757d;
+        }
+
+        .btn-info, .btn-warning {
+            margin-right: 5px;
+        }
+
+        .btn-add-user i, .btn-detail i, .btn-edit i {
+            margin-right: 5px;
         }
     </style>
 @endpush
@@ -170,7 +257,7 @@
                     paginate: {
                         first: "Pertama",
                         last: "Terakhir",
-                        next: "Berikutnya",
+                        next: "Selanjutnya",
                         previous: "Sebelumnya"
                     },
                 },
@@ -181,9 +268,14 @@
                         className: "text-center",
                         orderable: false,
                         searchable: false,
-                        render: function (data, type, row, meta) {
+                        render: function(data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
+                    },
+                    {
+                        targets: -1,
+                        orderable: false,
+                        searchable: false
                     }
                 ],
                 dom: '<"row mb-2"<"col-sm-6"l><"col-sm-6 d-flex justify-content-end align-items-center"f>>' +
@@ -193,8 +285,8 @@
 
             // Inject tombol Tambah Pengguna
             $('#custom-toolbar').html(`
-                <button type="button" class="btn btn-primary w-100" style="max-width: 300px;" data-toggle="modal" data-target="#addUserModal">
-                    Tambah Pengguna
+                <button type="button" class="btn btn-primary btn-add-user w-100" style="max-width: 300px;" data-toggle="modal" data-target="#addUserModal">
+                    <i class="nav-icon fas fa-users"></i> Tambah Pengguna
                 </button>
             `);
 
@@ -222,11 +314,14 @@
                             confirmButtonText: 'OK',
                             confirmButtonColor: '#3085d6'
                         });
-                        table.row.add({
-                            username: response.user.username,
-                            name: response.user.name,
-                            level_nama: response.user.level_nama
-                        }).draw();
+                        table.row.add([
+                            '', // Placeholder for auto-increment number
+                            response.user.username,
+                            response.user.name,
+                            response.user.level_nama,
+                            '<button class="btn btn-info btn-sm btn-detail" data-id="' + response.user.id_user + '"><i class="fas fa-eye"></i> Detail</button>' +
+                            '<button class="btn btn-warning btn-sm btn-edit" data-id="' + response.user.id_user + '"><i class="fas fa-edit"></i> Edit</button>'
+                        ]).draw();
                         $('#addUserForm')[0].reset();
                     },
                     error: function (xhr) {
@@ -246,8 +341,107 @@
                 });
             });
 
+            // Detail pengguna
+            $(document).on('click', '.btn-detail', function () {
+                let id = $(this).data('id');
+                $.ajax({
+                    url: '{{ route("users.manage") }}/' + id,
+                    type: 'GET',
+                    success: function (response) {
+                        $('#detailUsername').val(response.username);
+                        $('#detailName').val(response.name);
+                        $('#detailLevel').val(response.level_nama);
+                        $('#detailUserModal').modal('show');
+                    },
+                    error: function (xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: xhr.responseJSON?.error || 'Terjadi kesalahan saat mengambil data',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#dc3545'
+                        });
+                    }
+                });
+            });
+
+            // Edit pengguna
+            $(document).on('click', '.btn-edit', function () {
+                let id = $(this).data('id');
+                $.ajax({
+                    url: '{{ route("users.manage") }}/' + id,
+                    type: 'GET',
+                    success: function (response) {
+                        $('#editUserId').val(id);
+                        $('#editUsername').val(response.username);
+                        $('#editName').val(response.name);
+                        $('#editLevelId').val(response.id_level);
+                        $('#editPassword').val('');
+                        $('#editUserModal').modal('show');
+                    },
+                    error: function (xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: xhr.responseJSON?.error || 'Terjadi kesalahan saat mengambil data',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#dc3545'
+                        });
+                    }
+                });
+            });
+
+            // Submit form edit pengguna
+            $('#submitEditUserForm').click(function (e) {
+                e.preventDefault();
+                let id = $('#editUserId').val();
+                let formData = new FormData($('#editUserForm')[0]);
+                $.ajax({
+                    url: '{{ route("users.manage") }}/' + id,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-HTTP-Method-Override': 'PUT'
+                    },
+                    success: function (response) {
+                        $('#editUserModal').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sukses',
+                            text: response.message || 'Data berhasil diperbarui',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#3085d6'
+                        });
+                        table.clear().draw();
+                        $.ajax({
+                            url: '{{ route("users.manage") }}',
+                            type: 'GET',
+                            success: function () {
+                                location.reload();
+                            }
+                        });
+                    },
+                    error: function (xhr) {
+                        let errors = xhr.responseJSON?.errors || { general: ['Terjadi kesalahan saat menyimpan data'] };
+                        let errorMessage = '';
+                        $.each(errors, function (key, value) {
+                            errorMessage += value + '<br>';
+                        });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            html: errorMessage,
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#dc3545'
+                        });
+                    }
+                });
+            });
+
             // Hapus alert error saat modal dibuka ulang
-            $('#addUserModal').on('show.bs.modal', function () {
+            $('#addUserModal, #editUserModal').on('show.bs.modal', function () {
                 $('.modal-body .alert').remove();
             });
         });
