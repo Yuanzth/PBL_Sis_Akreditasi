@@ -53,6 +53,62 @@ class ManageUserController extends Controller
         ]);
 
         Log::info('New user created by SuperAdmin', ['username' => $request->username]);
-        return redirect()->back()->with('success', 'Pengguna berhasil ditambahkan.');
+        return response()->json([
+            'message' => 'Pengguna berhasil ditambahkan.',
+            'user' => [
+                'username' => $request->username,
+                'name' => $request->name,
+                'level_nama' => \App\Models\LevelModel::find($request->id_level)->level_nama
+            ]
+        ]);
+    }
+
+    public function show($id)
+    {
+        $user = Auth::user();
+        if ($user->level->level_kode !== 'SuperAdmin') {
+            return response()->json(['error' => 'Anda tidak memiliki akses.'], 403);
+        }
+
+        $user = UserModel::with('level')->findOrFail($id);
+        return response()->json([
+            'username' => $user->username,
+            'name' => $user->name,
+            'level_nama' => $user->level->level_nama,
+            'id_level' => $user->id_level
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = Auth::user();
+        if ($user->level->level_kode !== 'SuperAdmin') {
+            return response()->json(['error' => 'Anda tidak memiliki akses.'], 403);
+        }
+
+        $request->validate([
+            'username' => 'required|unique:m_user,username,' . $id . ',id_user',
+            'name' => 'required',
+            'password' => 'nullable|min:5',
+            'id_level' => 'required|exists:m_level,id_level',
+        ]);
+
+        $user = UserModel::findOrFail($id);
+        $user->update([
+            'username' => $request->username,
+            'name' => $request->name,
+            'password' => $request->password ? bcrypt($request->password) : $user->password,
+            'id_level' => $request->id_level,
+        ]);
+
+        Log::info('User updated by SuperAdmin', ['username' => $request->username]);
+        return response()->json([
+            'message' => 'Pengguna berhasil diperbarui.',
+            'user' => [
+                'username' => $user->username,
+                'name' => $user->name,
+                'level_nama' => $user->level->level_nama
+            ]
+        ]);
     }
 }
