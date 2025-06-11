@@ -26,32 +26,34 @@
             padding-bottom: 5px;
         }
 
-        .data-pendukung-cards {
-            display: flex;
-            flex-wrap: wrap;
+        .data-pendukung-list {
+            list-style-type: none;
+            padding-left: 0;
         }
 
-        .data-pendukung-card {
-            display: inline-block;
-            margin: 10px;
-            padding: 15px;
+        .data-pendukung-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s, box-shadow 0.2s;
-            width: 200px;
-            text-align: center;
         }
 
-        .data-pendukung-card:hover {
+        .data-pendukung-item:hover {
             transform: translateY(-5px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .data-pendukung-card .name {
+        .data-pendukung-name {
+            flex-grow: 1;
+            max-width: 100%; /* Lebar maksimum untuk nama data */
+            word-break: break-word; /* Memecah kata ke baris baru jika terlalu panjang */
             font-weight: 500;
             color: #2980b9;
-            margin-bottom: 5px;
+            margin-right: 10px;
         }
 
         .data-pendukung-form {
@@ -255,9 +257,7 @@
 
                 const LICENSE_KEY = 'eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3NTAzNzc1OTksImp0aSI6IjdhMGViMjcxLWY1YjAtNDk3ZC1iOTYzLTFlYWRhMjcxOGY3ZiIsInVzYWdlRW5kcG9pbnQiOiJodHRwczovL3Byb3h5LWV2ZW50LmNrZWRpdG9yLmNvbSIsImRpc3RyaWJ1dGlvbkNoYW5uZWwiOlsiY2xvdWQiLCJkcnVwYWwiLCJzaCJdLCJ3aGl0ZUxhYmVsIjp0cnVlLCJsaWNlbnNlVHlwZSI6InRyaWFsIiwiZmVhdHVyZXMiOlsiKiJdLCJ2YyI6IjE1NTk1MDBkIn0.97t5NfnTUy3iThZIg92yj2aLEgkbchX8d6nmhXhjAdRr0Pp8H5kcmvE2VZ0ZiwvzYcUgjH7uaEA76G8p7eIP1Q';
 
-                // Ambil data awal dari textarea
                 let initialData = element.value || '';
-                // Bersihkan data dari karakter yang tidak diperlukan seperti { dan }
                 initialData = initialData.replace(/^{|}$/g, '');
 
                 const editorConfig = {
@@ -326,7 +326,7 @@
                             { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
                         ]
                     },
-                    initialData: initialData, // Gunakan data awal yang telah dibersihkan
+                    initialData: initialData,
                     licenseKey: LICENSE_KEY,
                     link: {
                         addTargetToExternalLinks: true,
@@ -608,51 +608,16 @@
         <div class="category-section">
             <div class="category-title">{{ $detail->kategori->nama_kategori }}</div>
 
-            <!-- Form tambah data pendukung -->
-            @if ($kriteria->status_selesai != 'Submitted')
-            <form id="add-form-{{ $index }}" class="data-pendukung-form-add add-form" data-category="{{ $index }}">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Nama Data Pendukung</label>
-                        <textarea class="form-control" name="data_pendukung[{{ $index }}][new][nama_data]" rows="2"></textarea>
-                        <input type="hidden" name="data_pendukung[{{ $index }}][new][id_detail_kriteria]" value="{{ $detail->id_detail_kriteria }}">
-                        <input type="hidden" name="data_pendukung[{{ $index }}][new][index]" value="new">
-                    </div>
-                    <div class="form-group">
-                        <label>Deskripsi Data Pendukung</label>
-                        <div class="editor-container editor-container_classic-editor">
-                            <div class="editor-container__editor">
-                                <textarea class="ckeditor" name="data_pendukung[{{ $index }}][new][deskripsi_data]"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>URL Data Pendukung</label>
-                        <textarea class="form-control" name="data_pendukung[{{ $index }}][new][hyperlink_data]" rows="2"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Upload Data</label>
-                        <div class="dropzone"></div>
-                    </div>
-                </div>
-                <div class="action-buttons">
-                    <button type="button" class="btn btn-primary save-btn">Save</button>
-                    <button type="button" class="btn btn-success cancel-btn">Cancel</button>
-                    <button type="button" class="btn btn-danger delete-btn" disabled>Delete</button>
-                </div>
-            </form>
-            @endif
-
             <!-- Daftar data pendukung yang sudah ada -->
             @if ($detail->dataPendukung->count() > 0)
-                <div class="data-pendukung-cards">
+                <ul class="data-pendukung-list">
                     @foreach ($detail->dataPendukung as $dataIndex => $dataPendukung)
-                        <div class="data-pendukung-card">
-                            <div class="name">{{ $dataPendukung->nama_data }}</div>
+                        <li class="data-pendukung-item">
+                            <div class="data-pendukung-name">{{ $dataPendukung->nama_data }}</div>
                             @if ($kriteria->status_selesai != 'Submitted')
                                 <button class="btn btn-warning edit-data-btn" data-category="{{ $index }}" data-index="{{ $dataIndex }}">Edit</button>
                             @endif
-                        </div>
+                        </li>
 
                         <!-- Form edit data pendukung -->
                         @if ($kriteria->status_selesai != 'Submitted')
@@ -700,13 +665,45 @@
                             </form>
                         @endif
                     @endforeach
-                </div>
+                </ul>
             @endif
 
-            <!-- Tombol tambah data pendukung -->
+            <!-- Form tambah data pendukung (dipindahkan ke bawah) -->
             @if ($kriteria->status_selesai != 'Submitted')
+                <form id="add-form-{{ $index }}" class="data-pendukung-form-add add-form" data-category="{{ $index }}">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nama Data Pendukung</label>
+                            <textarea class="form-control" name="data_pendukung[{{ $index }}][new][nama_data]" rows="2"></textarea>
+                            <input type="hidden" name="data_pendukung[{{ $index }}][new][id_detail_kriteria]" value="{{ $detail->id_detail_kriteria }}">
+                            <input type="hidden" name="data_pendukung[{{ $index }}][new][index]" value="new">
+                        </div>
+                        <div class="form-group">
+                            <label>Deskripsi Data Pendukung</label>
+                            <div class="editor-container editor-container_classic-editor">
+                                <div class="editor-container__editor">
+                                    <textarea class="ckeditor" name="data_pendukung[{{ $index }}][new][deskripsi_data]"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>URL Data Pendukung</label>
+                            <textarea class="form-control" name="data_pendukung[{{ $index }}][new][hyperlink_data]" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Upload Data</label>
+                            <div class="dropzone"></div>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-primary save-btn">Save</button>
+                        <button type="button" class="btn btn-success cancel-btn">Cancel</button>
+                        <button type="button" class="btn btn-danger delete-btn" disabled>Delete</button>
+                    </div>
+                </form>
                 <button type="button" class="btn btn-warning add-data-btn" data-category="{{ $index }}">Tambah Data Pendukung</button>
             @endif
+
         </div>
         @endforeach
 
