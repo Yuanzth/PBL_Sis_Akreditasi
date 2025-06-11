@@ -22,8 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if(config('app.env') === 'local'){
-            URL::forceScheme('https');
-        }   
+        Blade::directive('currency', function ($expression) {
+            return "<?php echo currency($expression); ?>";
+        }); 
     }
 }
