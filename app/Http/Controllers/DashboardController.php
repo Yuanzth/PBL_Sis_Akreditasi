@@ -9,7 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class DashboardController extends Controller {
+class DashboardController extends Controller
+{
     public function index()
     {
         $user = Auth::user();
@@ -39,9 +40,8 @@ class DashboardController extends Controller {
         } elseif ($level_kode === 'SuperAdmin') {
             $kriteria = KriteriaModel::all();
         } elseif ($level_kode === 'KPS_Kajur') {
-            $kriteria = KriteriaModel::where('status_selesai', 'Submitted')->get();
+            $kriteria = KriteriaModel::all(); // Ambil semua untuk analisis status
         } elseif (in_array($level_kode, ['KJM', 'Direktur'])) {
-            // Untuk KJM dan Direktur, ambil semua kriteria yang sudah divalidasi tahap satu oleh KPS/Kajur
             $kriteria = KriteriaModel::whereHas('validasi', function ($query) {
                 $query->whereIn('id_user', [10, 11]) // Validasi tahap satu oleh KPS/Kajur
                       ->where('status', 'Valid');
@@ -97,18 +97,10 @@ class DashboardController extends Controller {
 
         if ($level_kode === 'SuperAdmin' && $kriteria) {
             foreach ($kriteria as $k) {
-                $validasiTahapSatu = ValidasiModel::where('id_kriteria', $k->id_kriteria)
-                    ->whereIn('id_user', [10, 11])
-                    ->where('updated_at', '>=', $k->updated_at)
-                    ->first();
-                $validasiTahapDua = ValidasiModel::where('id_kriteria', $k->id_kriteria)
-                    ->whereIn('id_user', [12, 13])
-                    ->where('updated_at', '>=', $k->updated_at)
-                    ->first();
-
-                if ($validasiTahapDua && $validasiTahapDua->status === 'Valid') {
+                $validasiRecords = $k->validasi()->get();
+                if ($validasiRecords->whereIn('id_user', [12, 13])->where('status', 'Valid')->isNotEmpty()) {
                     $statusCounts['tahap_dua']++;
-                } elseif ($validasiTahapSatu && $validasiTahapSatu->status === 'Valid') {
+                } elseif ($validasiRecords->whereIn('id_user', [10, 11])->where('status', 'Valid')->isNotEmpty()) {
                     $statusCounts['tahap_satu']++;
                 } elseif ($k->status_selesai === 'Submitted') {
                     $statusCounts['submitted']++;
@@ -120,62 +112,45 @@ class DashboardController extends Controller {
 
         // Hitung status kriteria untuk KPS/Kajur, KJM, dan Direktur
         $stats = ['submitted' => 0, 'valid' => 0, 'rejected' => 0, 'on_progress' => 0];
-        if ($level_kode === 'KPS_Kajur' && $kriteria) {
+        if (in_array($level_kode, ['KPS_Kajur', 'KJM', 'Direktur']) && $kriteria) {
             foreach ($kriteria as $k) {
-                $validasiTahapSatu = ValidasiModel::where('id_kriteria', $k->id_kriteria)
-                    ->whereIn('id_user', [10, 11])
-                    ->where('updated_at', '>=', $k->updated_at)
-                    ->first();
-                $validasiTahapDua = ValidasiModel::where('id_kriteria', $k->id_kriteria)
-                    ->whereIn('id_user', [12, 13])
-                    ->where('updated_at', '>=', $k->updated_at)
-                    ->first();
+                $validasiRecords = $k->validasi()->get();
+                $hasTahapSatuValid = $validasiRecords->whereIn('id_user', [10, 11])->where('status', 'Valid')->isNotEmpty();
+                $hasTahapDuaValid = $validasiRecords->whereIn('id_user', [12, 13])->where('status', 'Valid')->isNotEmpty();
+                $hasRejection = $validasiRecords->where('status', 'Belum Validasi')->isNotEmpty();
+                $hasNoValidation = $validasiRecords->isEmpty();
 
-                if ($validasiTahapDua && $validasiTahapDua->status === 'Valid') {
-                    $stats['valid']++;
-                    $statusCounts['tahap_dua']++;
-                } elseif ($validasiTahapSatu && $validasiTahapSatu->status === 'Valid') {
-                    $stats['valid']++;
-                    $statusCounts['tahap_satu']++;
-                } elseif ($validasiTahapSatu && $validasiTahapSatu->status === 'Belum Validasi') {
-                    $stats['rejected']++;
-                    $statusCounts['on_progress']++;
-                } elseif ($k->status_selesai === 'Submitted') {
-                    $stats['submitted']++;
-                    $statusCounts['submitted']++;
-                } else {
-                    $stats['on_progress']++;
-                    $statusCounts['on_progress']++;
-                }
-            }
-        } elseif (in_array($level_kode, ['KJM', 'Direktur']) && $kriteria) {
-            foreach ($kriteria as $k) {
-                // Ambil validasi tahap satu
-                $validasiTahapSatu = ValidasiModel::where('id_kriteria', $k->id_kriteria)
-                    ->whereIn('id_user', [10, 11])
-                    ->where('updated_at', '>=', $k->updated_at)
-                    ->first();
-
-                // Ambil validasi tahap dua (KJM atau Direktur)
-                $validasiTahapDua = ValidasiModel::where('id_kriteria', $k->id_kriteria)
-                    ->whereIn('id_user', [12, 13])
-                    ->where('updated_at', '>=', $k->updated_at)
-                    ->orderBy('updated_at', 'desc')
-                    ->first();
-
-                // Logika penghitungan status
-                if ($validasiTahapDua && $validasiTahapDua->status === 'Valid') {
-                    $stats['valid']++;
-                    $statusCounts['tahap_dua']++;
-                } elseif ($validasiTahapDua && $validasiTahapDua->status === 'Belum Validasi') {
-                    $stats['rejected']++;
-                    $statusCounts['on_progress']++;
-                } elseif ($validasiTahapSatu && $validasiTahapSatu->status === 'Valid') {
-                    $stats['submitted']++;
-                    $statusCounts['tahap_satu']++;
-                } else {
-                    $stats['on_progress']++;
-                    $statusCounts['on_progress']++;
+                if ($level_kode === 'KPS_Kajur') {
+                    if ($hasTahapSatuValid) {
+                        $stats['valid']++;
+                        $statusCounts['tahap_satu']++;
+                    } elseif ($hasRejection) {
+                        $stats['rejected']++;
+                        $statusCounts['on_progress']++;
+                    } elseif ($k->status_selesai === 'Submitted' && $hasNoValidation) {
+                        $stats['submitted']++;
+                        $statusCounts['submitted']++;
+                    } elseif ($k->status_selesai === 'Save' && $hasNoValidation) {
+                        $stats['on_progress']++;
+                        $statusCounts['on_progress']++;
+                    }
+                } elseif (in_array($level_kode, ['KJM', 'Direktur'])) {
+                    if ($hasTahapDuaValid && $hasTahapSatuValid) {
+                        $stats['valid']++;
+                        $statusCounts['tahap_dua']++;
+                    } elseif ($hasRejection) {
+                        $stats['rejected']++;
+                        $statusCounts['on_progress']++;
+                    } elseif ($hasTahapSatuValid && !$hasTahapDuaValid) {
+                        $stats['submitted']++;
+                        $statusCounts['tahap_satu']++;
+                    } elseif ($k->status_selesai === 'Submitted' && $hasNoValidation) {
+                        $stats['submitted']++;
+                        $statusCounts['submitted']++;
+                    } elseif ($k->status_selesai === 'Save' && $hasNoValidation) {
+                        $stats['on_progress']++;
+                        $statusCounts['on_progress']++;
+                    }
                 }
             }
         }
