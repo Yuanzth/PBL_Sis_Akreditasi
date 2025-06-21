@@ -85,19 +85,19 @@
     }
 
     .card.submitted .icon {
-        background-color: #dc3545;
+        background-color: #3bc237;
     }
 
     .card.valid .icon {
-        background-color: #28a745;
+        background-color: #2894a7;
     }
 
     .card.rejected .icon {
-        background-color: #6f42c1;
+        background-color: #da4b4b;
     }
 
     .card.on-progress .icon {
-        background-color: #fd7e14;
+        background-color: #ff7f07;
     }
 
     .card h3 {
